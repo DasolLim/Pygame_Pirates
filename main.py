@@ -9,6 +9,7 @@ bg_rect = bg_img.get_rect()
 screen = pygame.display.set_mode((bg_rect.width, bg_rect.height))
 screen_rect = screen.get_rect()
 
+
 # Initialize the first beach scene image
 beachImg = pygame.image.load('sceneimage.png')
 beachImg = pygame.transform.scale(beachImg,(1280,780))

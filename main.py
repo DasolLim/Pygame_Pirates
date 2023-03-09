@@ -31,4 +31,4 @@ while running:
     render()
 
 
-pygame.quit() # Can you see this
+pygame.quit() # Can you see this, i made a pull request

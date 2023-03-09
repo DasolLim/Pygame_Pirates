@@ -1,1 +1,2 @@
 # Pygame-Pirates
+Welcome to Team 17's game called "Captian Crunch's Adventure." In this game players will explore an island, killing skeleton monsters gaining coins to upgrade your character's attributes. Once the player has defeated [insert required #] skeletons they can move on to the next part of the island where they face the skeleton boss. Upon defeating the skeleton boss, the player will win.

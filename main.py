@@ -9,7 +9,7 @@ bg_rect = bg_img.get_rect()
 screen = pygame.display.set_mode((bg_rect.width, bg_rect.height))
 screen_rect = screen.get_rect()
 
-
+#testing again
 def render():
     screen.blit(bg_img,bg_rect)
     pygame.display.flip()

@@ -60,7 +60,7 @@ def render():
         screen.blit(player_img,player_rect)
 
     #checking if mouse is within game window
-    if pygame.mouse.get_focused() == True:
+    if pygame.mouse.get_focused() == True and loadPlaying:
         #adding mouse image to screen
         screen.blit(cursor_img,pygame.mouse.get_pos())
 

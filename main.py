@@ -60,7 +60,7 @@ def render():
         screen.blit(player_img,player_rect)
 
     #checking if mouse is within game window
-    if pygame.mouse.get_focused() == True and loadPlaying:
+    if pygame.mouse.get_focused() == True:
         #adding mouse image to screen
         screen.blit(cursor_img,pygame.mouse.get_pos())
 
@@ -83,11 +83,11 @@ while running:
             (x, y) = pygame.mouse.get_pos()
             print(x, y)
             # start the game when button is pressed by moving to a different scene
-            if startRect.collidepoint(x, y):
+            if startRect.collidepoint(x, y) and loadPlaying:
                 loadPlaying=False
                 bg_img = beachImg
             # exit the game when button is pressed
-            if exitRect.collidepoint(x, y):
+            if exitRect.collidepoint(x, y) and loadPlaying:
                 running = False
 
     #Player movement
@@ -110,8 +110,9 @@ while running:
         player_rect.right = bg_rect.right
     if player_rect.top < bg_rect.top:
         player_rect.top = bg_rect.top
-    if player_rect.bottom > bg_rect.bottom:
-        player_rect.bottom = bg_rect.bottom
+    if player_rect.bottom > 528:
+        player_rect.bottom = 528
+
     # render
     render()
 

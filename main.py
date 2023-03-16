@@ -16,7 +16,6 @@ cursor_rect = cursor_img.get_rect()
 pygame.mouse.set_visible(False)
 loadPlaying = True
 
-
 #Initialize player image
 player_img = pygame.image.load("Pirate_Sprite_100x100.png")
 player_img_with_left_flip = pygame.transform.flip(player_img, True, False)

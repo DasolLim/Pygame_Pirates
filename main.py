@@ -1,5 +1,5 @@
 #imports
-import pygame, time
+import pygame, gameSprites
 
 #initializing pygame
 pygame.init()
@@ -15,15 +15,6 @@ cursor_img = pygame.transform.scale(cursor_img,(50,50))
 cursor_rect = cursor_img.get_rect()
 pygame.mouse.set_visible(False)
 loadPlaying = True
-
-#Initialize player image
-player_img = pygame.image.load("Pirate_Sprite_100x100.png")
-player_img_with_left_flip = pygame.transform.flip(player_img, True, False)
-player_img_with_right_flip = player_img
-player_rect = player_img.get_rect()
-player_rect.center = bg_rect.center
-player_speed = 5
-
 
 screen = pygame.display.set_mode((bg_rect.width, bg_rect.height))
 screen_rect = screen.get_rect()
@@ -49,14 +40,36 @@ startRect = pygame.Rect(415, 225, width, height)
 exitRect = pygame.Rect(415, 425, width, height)
 
 
+#Initialize player image
+player_img = pygame.image.load("Pirate_Sprite_100x100.png")
+player_img_with_left_flip = pygame.transform.flip(player_img, True, False)
+player_img_with_right_flip = player_img
+
+# Creating Player Sprite
+num_of_player = 1
+player_group = pygame.sprite.Group()
+for x in range (num_of_player):
+    player_group.add(gameSprites.Player("Pirate_Sprite_100x100.png", 50, 50, 0, 0))
+
+# Creating Mob Sprite
+num_of_mobs = 5
+mob_group = pygame.sprite.Group()
+for x in range (num_of_mobs):
+    mob_group.add(gameSprites.Mob("mob.png", 50, 50, [4,4]))
+
 def render():
 
-    # pygame.draw.rect(screen, color, startRect)
     # pygame.draw.rect(screen, color, startRect)
     screen.blit(bg_img,bg_rect)
     
     if not loadPlaying:
-        screen.blit(player_img,player_rect)
+        screen.blit(player_img, player_group.sprites()[0].rect)
+        
+        # Drawing mobs on screen
+        mob_group.update()
+        mob_group.draw(screen)
+        for sprites in mob_group.sprites():
+            sprites.collision()
 
     #checking if mouse is within game window
     if pygame.mouse.get_focused() == True and loadPlaying:
@@ -93,24 +106,18 @@ while running:
     keys = pygame.key.get_pressed()
     if keys[pygame.K_RIGHT]:
         player_img = player_img_with_right_flip
-        player_rect.x +=5
+        player_group.sprites()[0].rect.x += 5
     if keys[pygame.K_LEFT]:
         player_img = player_img_with_left_flip
-        player_rect.x -=5
+        player_group.sprites()[0].rect.x -= 5
     if keys[pygame.K_UP]:
-        player_rect.y -=5
+        player_group.sprites()[0].rect.y -= 5
     if keys[pygame.K_DOWN]:
-        player_rect.y +=5
+        player_group.sprites()[0].rect.y += 5
+
     
     #Rough player boundaries
-    if player_rect.left < bg_rect.left:
-        player_rect.left = bg_rect.left
-    if player_rect.right > bg_rect.right:
-        player_rect.right = bg_rect.right
-    if player_rect.top < bg_rect.top:
-        player_rect.top = bg_rect.top
-    if player_rect.bottom > 528:
-        player_rect.bottom = 528
+    player_group.sprites()[0].collision()
 
     # render
     render()

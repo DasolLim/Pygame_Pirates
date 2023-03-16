@@ -1,30 +1,37 @@
 import pygame,random
-from main import bg_rect
+
+bg_img = pygame.image.load('backgroundimage.png')
+bg_img = pygame.transform.scale(bg_img, (1280, 780))
+bg_rect = bg_img.get_rect()
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self,img_path,health,damage,speed,centerX,centerY):
+    def __init__(self,img_path,health,damage,centerX,centerY):
         super().__init__()
         self.image = pygame.image.load(img_path)
         self.rect = self.image.get_rect()
         self.rect.center = (centerX,centerY)
         self.health = health
         self.damage = damage
-        self.speed = speed
-    def update(self):
-        self.rect.x = self.rect.x + self.speed[0]
-        self.rect.y = self.rect.y + self.speed[1]
-    def collision(self):
-        #code collision for general gameobject i.e. detect when they hit the boundaries
-        hitBoundary = False
         
 class Player(GameObject):
-    def __init__(self,img_path,health,damage,speed,kill_counter,coins):
+    def __init__(self,img_path,health,damage,kill_counter,coins):
         self.kill_counter = kill_counter
         self.coins = coins
-        super().__init__(self,img_path,health,damage,speed,bg_rect.centerx,bg_rect.centery)
+        super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery)
+
+    def collision(self):
+        if self.rect.left < bg_rect.left:
+            self.rect.left = bg_rect.left
+        if self.rect.right > bg_rect.right:
+            self.rect.right = bg_rect.right
+        if self.rect.top < bg_rect.top:
+            self.rect.top = bg_rect.top
+        if self.rect.bottom > 528:
+            self.rect.bottom = 528
 
 class Mob(GameObject):
     def __init__(self,img_path,health,damage,speed):
+        self.speed = speed
         random_side = random.choice([-1,1])
 
         # Deciding whether the mob will spawn the left or right
@@ -34,14 +41,31 @@ class Mob(GameObject):
             rand_x = bg_rect.right-50
 
         # Spawn mob at random y value
-        rand_y = random.randint(50,bg_rect.bottom - 50)
+        rand_y = random.randint(50,528 - 50)
 
-        super().__init__(self,img_path,health,damage,speed, rand_x,rand_y)
+        super().__init__(img_path,health,damage, rand_x,rand_y)
+    def update(self):
+        self.rect.x = self.rect.x + self.speed[0]
+        self.rect.y = self.rect.y + self.speed[1]
+        
+    def collision(self):
+        if self.rect.left < bg_rect.left:
+            self.rect.left = bg_rect.left
+            self.speed[0] *= -1
+        if self.rect.right > bg_rect.right:
+            self.rect.right = bg_rect.right
+            self.speed[0] *= -1
+        if self.rect.top < bg_rect.top:
+            self.rect.top = bg_rect.top
+            self.speed[1] *= -1
+        if self.rect.bottom > 528:
+            self.rect.bottom = 528
+            self.speed[1] *= -1
 
 class Boss(GameObject):
-    def __init__(self,img_path,health,damage,speed,shield):
+    def __init__(self,img_path,health,damage,shield):
         self.shield = shield
-        super().__init__(self,img_path,health,damage,speed)
+        super().__init__(img_path,health,damage)
 
     def __tracker__(self, playerCord):
         # Input code here to track player movement

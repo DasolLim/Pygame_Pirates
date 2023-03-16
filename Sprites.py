@@ -54,7 +54,7 @@ class Boss(GameObject):
     
     def __mobSpawner__(self):
         # Input code here for boss to spawn mobs around him
-        
+        x=0
 
 
 

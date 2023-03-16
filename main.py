@@ -71,21 +71,18 @@ def render():
     pygame.display.flip()
 
 #musicPlayer
-def musicPlayer(music,vol = 0.7,loop = 1,delay = 0,initialPlay = 0):
+def musicPlayer(music,vol = 0.7,loop = 0,initialPlay = 0):
 
     if initialPlay:
         pygame.mixer.music.load(music) 
-        pygame.mixer.music.play(loop)
-
-    elif delay:
-        pygame.mixer.music.queue(music)
         
     else:
+        pygame.mixer.music.stop()
         pygame.mixer.music.unload()
         pygame.mixer.music.load(music)
-        pygame.mixer.music.play(loop)
-
+        
     pygame.mixer.music.set_volume(vol)
+    pygame.mixer.music.play(loop)
     
     
 render()
@@ -112,8 +109,7 @@ while running:
             if startRect.collidepoint(x, y) and loadPlaying:
                 loadPlaying=False
                 bg_img = beachImg
-                musicPlayer('pirateArr.mp3', delay=0)
-                musicPlayer('levelMusic.mp3', 0.1, -1, 1)
+                musicPlayer('pirateArr.mp3')
             
             # exit the game when button is pressed
             if exitRect.collidepoint(x, y) and loadPlaying:
@@ -145,8 +141,9 @@ while running:
     # render
     render()
 
-    
+    #begining level music
+    if not pygame.mixer.music.get_busy():
+        musicPlayer('levelMusic.mp3', 0.01, -1)
 
     
-
 pygame.quit()

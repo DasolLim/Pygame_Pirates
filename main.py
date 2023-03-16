@@ -4,6 +4,9 @@ import pygame, time
 #initializing pygame
 pygame.init()
 
+#initializng mixer
+pygame.mixer.init()
+
 # Initialize the game
 bg_img = pygame.image.load('backgroundimage.png')
 bg_img = pygame.transform.scale(bg_img, (1280, 780))
@@ -67,14 +70,37 @@ def render():
     #refreshing screen
     pygame.display.flip()
 
+#musicPlayer
+def musicPlayer(music,vol = 0.7,loop = 1,delay = 0,initialPlay = 0):
 
+    if initialPlay:
+        pygame.mixer.music.load(music) 
+        pygame.mixer.music.play(loop)
+
+    elif delay:
+        pygame.mixer.music.queue(music)
+        
+    else:
+        pygame.mixer.music.unload()
+        pygame.mixer.music.load(music)
+        pygame.mixer.music.play(loop)
+
+    pygame.mixer.music.set_volume(vol)
+    
+    
 render()
 running = True
 FPS = 60
 clock = pygame.time.Clock()
+
+#playing menu music
+musicPlayer('menuMusic.mp3',loop = -1, initialPlay=1)
+
 # gameloop
 while running:
+    
     clock.tick(FPS)
+
     # event loop
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -86,6 +112,9 @@ while running:
             if startRect.collidepoint(x, y) and loadPlaying:
                 loadPlaying=False
                 bg_img = beachImg
+                musicPlayer('pirateArr.mp3', delay=0)
+                musicPlayer('levelMusic.mp3', 0.1, -1, 1)
+            
             # exit the game when button is pressed
             if exitRect.collidepoint(x, y) and loadPlaying:
                 running = False
@@ -115,6 +144,8 @@ while running:
 
     # render
     render()
+
+    
 
     
 

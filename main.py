@@ -28,6 +28,11 @@ beachImg = pygame.image.load('sceneimage.png')
 beachImg = pygame.transform.scale(beachImg, (1280, 780))
 beach_rect = beachImg.get_rect()
 
+# Initializing coin image for coin count
+coinImg = pygame.image.load('coin_100x94.png')
+coinImg = pygame.transform.scale(coinImg, (50,50))
+coin_rect = coinImg.get_rect()
+
 width = 395
 height = 135
 # start bound
@@ -56,9 +61,13 @@ for x in range (num_of_player):
 
 # Initializing font
 pygame.font.init()
-font = pygame.font.SysFont("Helvetica", 30)
+font = pygame.font.SysFont("arial", 30)
 # Initializing coin text
-coinCountText = font.render("Coins: "+ str(player_group.sprites()[0].coins), False, (0, 0, 0))
+coinCount = player_group.sprites()[0].coins
+coinCountText = font.render(str(coinCount), False, (255, 255, 255))
+# USE THESE 2 LINES TO INCREMENT coinCount and REDRAW THE COIN TEXT
+#coinCount += 1
+#coinCountText = font.render(str(coinCount), False, (255,255,255))
 
 # Creating Mob Sprite
 num_of_mobs = 5
@@ -73,7 +82,8 @@ def render():
     
     if not loadPlaying:
         # Draw the new updated text
-        screen.blit(coinCountText, (1150, 720))
+        screen.blit(coinCountText, (1230, 725))
+        screen.blit(coinImg, (1180, 720))
 
         # Draw player sprite on screen
         screen.blit(player_img, player_group.sprites()[0].rect)

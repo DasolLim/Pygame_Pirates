@@ -54,11 +54,17 @@ player_group = pygame.sprite.Group()
 for x in range (num_of_player):
     player_group.add(gameSprites.Player("Pirate_Sprite_100x100.png", 50, 50, 0, 0))
 
+# Initializing font
+pygame.font.init()
+font = pygame.font.SysFont("Helvetica", 30)
+# Initializing coin text
+coinCountText = font.render("Coins: "+ str(player_group.sprites()[0].coins), False, (0, 0, 0))
+
 # Creating Mob Sprite
 num_of_mobs = 5
 mob_group = pygame.sprite.Group()
 for x in range (num_of_mobs):
-    mob_group.add(gameSprites.Mob("mob.png", 50, 50, [4,4]))
+    mob_group.add(gameSprites.Mob("mob.png", 50, 50, [2,2]))
 
 def render():
 
@@ -66,6 +72,10 @@ def render():
     screen.blit(bg_img,bg_rect)
     
     if not loadPlaying:
+        # Draw the new updated text
+        screen.blit(coinCountText, (1150, 720))
+
+        # Draw player sprite on screen
         screen.blit(player_img, player_group.sprites()[0].rect)
         
         # Drawing mobs on screen

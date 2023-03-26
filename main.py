@@ -127,7 +127,7 @@ def render():
     pygame.display.flip()
 
 #musicPlayer
-def musicPlayer(music,vol = 0,loop = 0,initialPlay = 0):
+def musicPlayer(music,vol = 0.7,loop = 0,initialPlay = 0):
     #checking initial play
     if initialPlay:
         #loading music
@@ -189,7 +189,7 @@ while running:
             (x, y) = pygame.mouse.get_pos()
 
             #//////Debug///////#
-            print(x, y)
+            #print(x, y)
             #//////////////////#
 
             #checking collide point of mouse with start button

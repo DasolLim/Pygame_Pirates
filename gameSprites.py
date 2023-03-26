@@ -19,7 +19,7 @@ class Player(GameObject):
         self.coins = coins
         super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery)
 
-    def collision(self):
+    def collisionBeach(self):
         if self.rect.left < bg_rect.left:
             self.rect.left = bg_rect.left
         if self.rect.right > bg_rect.right:
@@ -28,6 +28,34 @@ class Player(GameObject):
             self.rect.top = bg_rect.top
         if self.rect.bottom > 528:
             self.rect.bottom = 528
+
+    def collisionForest(self):
+        if self.rect.left < bg_rect.left:
+            self.rect.left = bg_rect.left
+        if self.rect.top < bg_rect.top:
+            self.rect.top = bg_rect.top
+        if self.rect.bottom > bg_rect.bottom:
+            self.rect.bottom = bg_rect.bottom
+        if self.rect.right > bg_rect.right:
+            self.rect.right = bg_rect.right
+        if self.rect.bottom > 591 and self.rect.centerx > 920:
+            self.rect.bottom = 591
+        if self.rect.right > 920 and self.rect.bottom > 591:
+            self.rect.right = 920
+
+    def collisionCave(self):
+        if self.rect.left < bg_rect.left:
+            self.rect.left = bg_rect.left
+        if self.rect.bottom < 165:
+            self.rect.bottom = 165
+        if self.rect.bottom > bg_rect.bottom - 5:
+            self.rect.bottom = bg_rect.bottom - 5
+        if self.rect.right > bg_rect.right:
+            self.rect.right = bg_rect.right
+        if self.rect.bottom > 574 and self.rect.centerx > 995:
+            self.rect.bottom = 574
+        if self.rect.right > 995 and self.rect.bottom > 585:
+            self.rect.right = 995
 
 class Mob(GameObject):
     def __init__(self,img_path,health,damage,speed):
@@ -48,19 +76,67 @@ class Mob(GameObject):
         self.rect.x = self.rect.x + self.speed[0]
         self.rect.y = self.rect.y + self.speed[1]
         
-    def collision(self):
+    def collisionBeach(self):
         if self.rect.left < bg_rect.left:
             self.rect.left = bg_rect.left
             self.speed[0] *= -1
+            self.image = pygame.transform.flip(self.image,True,False)
         if self.rect.right > bg_rect.right:
             self.rect.right = bg_rect.right
             self.speed[0] *= -1
+            self.image = pygame.transform.flip(self.image,True,False)
         if self.rect.top < bg_rect.top:
             self.rect.top = bg_rect.top
             self.speed[1] *= -1
         if self.rect.bottom > 528:
             self.rect.bottom = 528
             self.speed[1] *= -1
+
+    def collisionForest(self):
+        if self.rect.left < bg_rect.left:
+            self.rect.left = bg_rect.left
+            self.speed[0] *= -1
+            self.image = pygame.transform.flip(self.image,True,False)
+        if self.rect.top < bg_rect.top:
+            self.rect.top = bg_rect.top
+            self.speed[1] *= -1
+        if self.rect.bottom > bg_rect.bottom:
+            self.rect.bottom = bg_rect.bottom
+            self.speed[1] *= -1
+        if self.rect.right > bg_rect.right:
+            self.rect.right = bg_rect.right
+            self.speed[0] *= -1
+            self.image = pygame.transform.flip(self.image,True,False)
+        if self.rect.bottom > 591 and self.rect.centerx > 920:
+            self.rect.bottom = 591
+            self.speed[1] *= -1
+        if self.rect.right > 920 and self.rect.bottom > 591:
+            self.rect.right = 920
+            self.speed[0] *= -1
+            self.image = pygame.transform.flip(self.image,True,False)
+
+    def collisionCave(self):
+        if self.rect.left < bg_rect.left:
+            self.rect.left = bg_rect.left
+            self.speed[0] *= -1
+            self.image = pygame.transform.flip(self.image,True,False)
+        if self.rect.bottom < 180:
+            self.rect.bottom = 180
+            self.speed[1] *= -1
+        if self.rect.bottom > bg_rect.bottom - 5:
+            self.rect.bottom = bg_rect.bottom - 5
+            self.speed[1] *= -1
+        if self.rect.right > bg_rect.right:
+            self.rect.right = bg_rect.right
+            self.speed[0] *= -1
+            self.image = pygame.transform.flip(self.image,True,False)
+        if self.rect.bottom > 574 and self.rect.centerx > 995:
+            self.rect.bottom = 574
+            self.speed[1] *= -1
+        if self.rect.right > 995 and self.rect.bottom > 585:
+            self.rect.right = 995
+            self.speed[0] *= -1
+            self.image = pygame.transform.flip(self.image,True,False)
 
 class Boss(GameObject):
     def __init__(self,img_path,health,damage,shield):

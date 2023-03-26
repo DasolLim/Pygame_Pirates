@@ -41,7 +41,7 @@ forestImg = pygame.transform.scale(forestImg,(1280,780))
 forest_rect = forestImg.get_rect()
 
 #initialize cave image
-caveImg = pygame.image.load('caveScene.jpg')
+caveImg = pygame.image.load('caveScene.png')
 caveImg = pygame.transform.scale(caveImg,(1280,780))
 cave_rect = caveImg.get_rect()
 
@@ -124,8 +124,6 @@ def render():
         if not shopPlaying:
             mob_group.update()
         mob_group.draw(screen)
-        for sprites in mob_group.sprites():
-            sprites.collision()
 
     if shopPlaying:
         screen.blit(shopImg,shop_rect)
@@ -155,6 +153,20 @@ def musicPlayer(music,vol = 0.7,loop = 0,initialPlay = 0):
     #looping music
     pygame.mixer.music.play(loop)
 
+#collisionPicker
+def collisionPicker(scene):
+    if scene == 'beach':
+        player_group.sprites()[0].collisionBeach()
+        for sprites in mob_group.sprites():
+            sprites.collisionBeach()
+    if scene == 'forest':
+        player_group.sprites()[0].collisionForest()
+        for sprites in mob_group.sprites():
+            sprites.collisionForest()
+    if scene == 'cave':
+        player_group.sprites()[0].collisionCave()
+        for sprites in mob_group.sprites():
+            sprites.collisionCave()
 
 #rendering    
 render()
@@ -164,6 +176,8 @@ running = True
 FPS = 60
 #setting clock
 clock = pygame.time.Clock()
+#collision
+scene = 'beach'
 
 #playing menu music
 musicPlayer('menuMusic.mp3',loop = -1, initialPlay=1)
@@ -242,12 +256,16 @@ while running:
     #if conditions are met and player exits screen through right side
     if keys[pygame.K_f]:
         current_img = forestImg
+        scene = 'forest'
+        
     #///////////////////////////#
 
     #///////////////////////////#
     #if conditions are met and player exits screen through right side
     if keys[pygame.K_c]:
         current_img = caveImg
+        scene = 'cave'
+
     #///////////////////////////#
 
     #///////////////////////////#
@@ -257,7 +275,7 @@ while running:
         musicPlayer('ending.mp3')
 
     #player boundaries
-    player_group.sprites()[0].collision()
+    collisionPicker(scene)
 
     #render
     render()

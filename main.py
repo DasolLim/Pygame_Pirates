@@ -1,5 +1,5 @@
 #imports
-import pygame, gameSprites
+import pygame, gameSprites, time
 
 #initializing pygame
 pygame.init()
@@ -12,14 +12,19 @@ bg_img = pygame.image.load('backgroundimage.png')
 bg_img = pygame.transform.scale(bg_img, (1280, 780))
 bg_rect = bg_img.get_rect()
 
+current_img = pygame.image.load('backgroundimage.png')
+current_img = pygame.transform.scale(bg_img, (1280, 780))
+current_rect = bg_img.get_rect()
+
 #initialize cursor image
 cursor_img = pygame.image.load('cursor.png')
-cursor_img = pygame.transform.scale(cursor_img,(50,50))
+cursor_img = pygame.transform.scale(cursor_img,(25,25))
 cursor_rect = cursor_img.get_rect()
 pygame.mouse.set_visible(False)
 
 #boolean flag
 loadPlaying = True
+shopPlaying = False
 
 #initializing screen
 screen = pygame.display.set_mode((bg_rect.width, bg_rect.height))
@@ -39,6 +44,13 @@ forest_rect = forestImg.get_rect()
 caveImg = pygame.image.load('caveScene.png')
 caveImg = pygame.transform.scale(caveImg,(1280,780))
 cave_rect = caveImg.get_rect()
+
+#initialize shop menu
+shopImg = pygame.image.load('menu.png')
+shopImg = pygame.transform.scale(shopImg,(750,750))
+shop_rect = shopImg.get_rect()
+shop_rect.center = screen_rect.center
+
 
 #initializing treasure image
 treasureImg = pygame.image.load('treasure.jpg')
@@ -89,19 +101,13 @@ coinCountText = font.render(str(coinCount), False, (255, 255, 255))
 # coinCountText = font.render(str(coinCount), False, (255,255,255))
 #/////////////////////////////////////////////////////////////////////////#
 
-#creating mob sprite group
-num_of_mobs = 5
-mob_group = pygame.sprite.Group()
-for x in range (num_of_mobs):
-    mob_group.add(gameSprites.Mob("mob.png", 50, 50, [2,2]))
-
 #render images
 def render():
 
     #pygame.draw.rect(screen, color, startRect)
 
     #adding background image
-    screen.blit(bg_img,bg_rect)
+    screen.blit(current_img,current_rect)
     
     #checking if on start screen
     if not loadPlaying:
@@ -115,11 +121,15 @@ def render():
         #player_group.draw(screen)
         
         #displaying mobs
-        mob_group.update()
+        if not shopPlaying:
+            mob_group.update()
         mob_group.draw(screen)
 
+    if shopPlaying:
+        screen.blit(shopImg,shop_rect)
+
     #checking if mouse is within game window
-    if pygame.mouse.get_focused() == True and loadPlaying:
+    if pygame.mouse.get_focused() == True and loadPlaying or shopPlaying:
         #adding mouse image to screen
         screen.blit(cursor_img,pygame.mouse.get_pos())
 
@@ -158,7 +168,6 @@ def collisionPicker(scene):
         for sprites in mob_group.sprites():
             sprites.collisionCave()
 
-    
 #rendering    
 render()
 #running to true
@@ -175,11 +184,11 @@ musicPlayer('menuMusic.mp3',loop = -1, initialPlay=1)
 
 # gameloop
 while running:
+    keys = pygame.key.get_pressed()
     #setting fps
     clock.tick(FPS)
     # event loop
     for event in pygame.event.get():
-
         #quitting event
         if event.type == pygame.QUIT:
             running = False
@@ -195,44 +204,74 @@ while running:
             #checking collide point of mouse with start button
             if startRect.collidepoint(x, y) and loadPlaying:
                 loadPlaying=False
-                bg_img = beachImg
+                current_img = beachImg
                 musicPlayer('pirateArr.mp3')
-            
+                #creating mob sprite group
+                num_of_mobs = 5
+                mob_group = pygame.sprite.Group()
+                for x in range (num_of_mobs):
+                    mob_group.add(gameSprites.Mob("mob.png", 50, 50, [2,2]))
+                player_group.remove(player_group.sprites()[0])
+                player_group.add(gameSprites.Player("Pirate_Sprite_100x100.png", 50, 50, 0, 0))
+
+                            
             #checking collide point of mouse with exit button
             if exitRect.collidepoint(x, y) and loadPlaying:
                 running = False
 
-    #player movement
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_RIGHT]:
-        player_img = player_img_with_right_flip
-        player_group.sprites()[0].rect.x += 5
-    if keys[pygame.K_LEFT]:
-        player_img = player_img_with_left_flip
-        player_group.sprites()[0].rect.x -= 5
-    if keys[pygame.K_UP]:
-        player_group.sprites()[0].rect.y -= 5
-    if keys[pygame.K_DOWN]:
-        player_group.sprites()[0].rect.y += 5
+        #open shop eventwith escape
+        if keys[pygame.K_ESCAPE] and not loadPlaying and not shopPlaying:
+            shopPlaying = True
+        #close shop with escape
+        elif keys[pygame.K_ESCAPE] and not loadPlaying and shopPlaying:
+            shopPlaying = False
 
+        # CHANGE TO HAVE IT ON MOUSE PRESS INSIDE THE CONTINUE BUTTON / EXIT
+        if keys[pygame.K_9] and shopPlaying:
+            shopPlaying = False
+            loadPlaying = True
+            current_img = bg_img
+            musicPlayer('menuMusic.mp3',loop = -1, initialPlay=1)
+
+
+
+
+
+    #player movement
+    if not shopPlaying:
+        if keys[pygame.K_RIGHT]:
+            player_img = player_img_with_right_flip
+            player_group.sprites()[0].rect.x += 5
+        if keys[pygame.K_LEFT]:
+            player_img = player_img_with_left_flip
+            player_group.sprites()[0].rect.x -= 5
+        if keys[pygame.K_UP]:
+            player_group.sprites()[0].rect.y -= 5
+        if keys[pygame.K_DOWN]:
+            player_group.sprites()[0].rect.y += 5
+
+
+    
     #///////////////////////////#
     #if conditions are met and player exits screen through right side
     if keys[pygame.K_f]:
-        bg_img = forestImg
+        current_img = forestImg
         scene = 'forest'
+        
     #///////////////////////////#
 
     #///////////////////////////#
     #if conditions are met and player exits screen through right side
     if keys[pygame.K_c]:
-        bg_img = caveImg
+        current_img = caveImg
         scene = 'cave'
+
     #///////////////////////////#
 
     #///////////////////////////#
     #if conditions are met for game completion
     if keys[pygame.K_t]:
-        bg_img = treasureImg
+        current_img = treasureImg
         musicPlayer('ending.mp3')
 
     #player boundaries

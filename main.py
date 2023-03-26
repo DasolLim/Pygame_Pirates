@@ -178,6 +178,8 @@ FPS = 60
 clock = pygame.time.Clock()
 #collision
 scene = 'beach'
+#creating mob sprite group
+mob_group = pygame.sprite.Group()
 
 #playing menu music
 musicPlayer('menuMusic.mp3',loop = -1, initialPlay=1)
@@ -206,8 +208,9 @@ while running:
                 loadPlaying=False
                 current_img = beachImg
                 musicPlayer('pirateArr.mp3')
-                #creating mob sprite group
+                #adding mob sprites
                 num_of_mobs = 5
+                #creating mob sprite group
                 mob_group = pygame.sprite.Group()
                 for x in range (num_of_mobs):
                     mob_group.add(gameSprites.Mob("mob.png", 50, 50, [2,2]))

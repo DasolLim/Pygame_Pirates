@@ -8,6 +8,7 @@ class GameObject(pygame.sprite.Sprite):
     def __init__(self,img_path,health,damage,centerX,centerY):
         super().__init__()
         self.image = pygame.image.load(img_path)
+        self.tempImage = self.image
         self.rect = self.image.get_rect()
         self.rect.center = (centerX,centerY)
         self.health = health
@@ -56,6 +57,16 @@ class Player(GameObject):
             self.rect.bottom = 574
         if self.rect.right > 995 and self.rect.bottom > 585:
             self.rect.right = 995
+            
+    def flipPlayer(self,right):
+        #initialize player image
+        player_img_with_left_flip = pygame.transform.flip(self.tempImage, True, False)
+        player_img_with_right_flip = self.tempImage
+        #initialize player image
+        if(right):
+            self.image = player_img_with_right_flip
+        else:
+            self.image = player_img_with_left_flip
 
 class Mob(GameObject):
     def __init__(self,img_path,health,damage,speed):

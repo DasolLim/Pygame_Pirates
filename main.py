@@ -51,7 +51,6 @@ shopImg = pygame.transform.scale(shopImg,(750,750))
 shop_rect = shopImg.get_rect()
 shop_rect.center = screen_rect.center
 
-
 #initializing treasure image
 treasureImg = pygame.image.load('treasure.jpg')
 treasureImg = pygame.transform.scale(treasureImg,(1280,780))
@@ -59,8 +58,13 @@ treasure_rect = treasureImg.get_rect()
 
 #initializing coin image
 coinImg = pygame.image.load('coin_100x94.png')
-coinImg = pygame.transform.scale(coinImg, (50,50))
+coinImg = pygame.transform.scale(coinImg, (65,65))
 coin_rect = coinImg.get_rect()
+
+#initializing heart image
+heartImg = pygame.image.load('Heart.png')
+heartImg = pygame.transform.scale(heartImg, (65,65))
+heart_rect = heartImg.get_rect()
 
 width = 395
 height = 135
@@ -101,6 +105,10 @@ coinCountText = font.render(str(coinCount), False, (255, 255, 255))
 # coinCountText = font.render(str(coinCount), False, (255,255,255))
 #/////////////////////////////////////////////////////////////////////////#
 
+#initializing heart text
+healthCount = player_group.sprites()[0].health
+healthCountText = font.render(str(healthCount), False, (255, 255, 255))
+
 #render images
 def render():
 
@@ -113,8 +121,12 @@ def render():
     if not loadPlaying:
 
         #displaying coin info
-        screen.blit(coinCountText, (1230, 725))
-        screen.blit(coinImg, (1180, 720))
+        screen.blit(coinCountText, (1230, 730))
+        screen.blit(coinImg, (1160, 720))
+
+        #displaying heart info
+        screen.blit(healthCountText, (1230, 680))
+        screen.blit(heartImg, (1160, 665))
 
         #displaying player sprite
         screen.blit(player_img, player_group.sprites()[0].rect)

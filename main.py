@@ -28,6 +28,12 @@ pygame.mouse.set_visible(False)
 screen = pygame.display.set_mode((mainmenu_rect.width, mainmenu_rect.height))
 screen_rect = screen.get_rect()
 
+#initialize text background
+textBackground_image = pygame.image.load('textBackground.png')
+textBackground_image = pygame.transform.scale(textBackground_image, (300,860))
+textBackground_rect = textBackground_image.get_rect()
+textBackground_rect.bottomright = screen_rect.bottomright
+
 #initialize beach scene
 beachImg = pygame.image.load('sceneimage.png')
 beachImg = pygame.transform.scale(beachImg, (1280, 780))
@@ -136,6 +142,8 @@ def render():
         global healthCount
         healthCount = player_group.sprites()[0].health
         healthCountText = font.render(str(healthCount), False, (255, 255, 255))
+        #displaying coin/health background
+        screen.blit(textBackground_image, (1125,570))
         #displaying coin info
         screen.blit(coinCountText, (1230, 730))
         screen.blit(coinImg, (1160, 720))

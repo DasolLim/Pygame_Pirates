@@ -210,6 +210,7 @@ while running:
                 musicPlayer('pirateArr.mp3')
                 #adding mob sprites
                 num_of_mobs = 5
+                scene = 'beach'
                 #creating mob sprite group
                 mob_group = pygame.sprite.Group()
                 for x in range (num_of_mobs):

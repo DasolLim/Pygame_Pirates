@@ -4,6 +4,17 @@ bg_img = pygame.image.load('backgroundimage.png')
 bg_img = pygame.transform.scale(bg_img, (1280, 780))
 bg_rect = bg_img.get_rect()
 
+attack_right=[pygame.image.load('middleSwing.png'),
+              pygame.image.load('middleSwing.png'),
+              pygame.image.load('finalSwing.png'),
+              pygame.image.load('finalSwing.png'),
+              pygame.image.load('Pirate_Sprite_100x100.png')]
+attack_left=[pygame.transform.flip(pygame.image.load('middleSwing.png'),True,False),
+             pygame.transform.flip(pygame.image.load('middleSwing.png'),True,False),
+             pygame.transform.flip(pygame.image.load('finalSwing.png'),True,False),
+             pygame.transform.flip(pygame.image.load('finalSwing.png'),True,False),
+             pygame.transform.flip(pygame.image.load('Pirate_Sprite_100x100.png'),True,False)]
+
 class GameObject(pygame.sprite.Sprite):
     def __init__(self,img_path,health,damage,centerX,centerY):
         super().__init__()
@@ -18,7 +29,18 @@ class Player(GameObject):
     def __init__(self,img_path,health,damage,kill_counter,coins):
         self.kill_counter = kill_counter
         self.coins = coins
+        self.attackFrame = 0
         super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery)
+
+    def attack(self,right):
+        if self.attackFrame > 4:
+            self.attackFrame = 0
+            return
+        if right:
+            self.image = attack_right[self.attackFrame]
+        else:
+            self.image = attack_left[self.attackFrame]
+        self.attackFrame += 1
 
     def collisionBeach(self):
         if self.rect.left < bg_rect.left:

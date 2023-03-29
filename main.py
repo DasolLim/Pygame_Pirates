@@ -1,5 +1,5 @@
 #imports
-import pygame, gameSprites, time
+import pygame, gameSprites
 
 #initializing pygame
 pygame.init()
@@ -100,7 +100,6 @@ mob_group = pygame.sprite.Group()
 loadPlaying = True
 shopPlaying = False
 running = True
-right = True
 #FPS
 FPS = 60
 #setting clock
@@ -186,7 +185,6 @@ def musicPlayer(music,vol = 0.7,loop = 0,initialPlay = 0):
     #looping music
     pygame.mixer.music.play(loop)
 
-#building scenes
 def sceneBuilder(newScene):
     global current_img
     global current_rect
@@ -282,28 +280,17 @@ while running:
     #player movement
     if not shopPlaying:
         if keys[pygame.K_RIGHT]:
-            right = True
+            player_group.sprites()[0].flipPlayer(True)
             player_group.sprites()[0].rect.x += 5
         if keys[pygame.K_LEFT]:
-            right = False
+            player_group.sprites()[0].flipPlayer(False)
             player_group.sprites()[0].rect.x -= 5
         if keys[pygame.K_UP]:
             player_group.sprites()[0].rect.y -= 5
         if keys[pygame.K_DOWN]:
             player_group.sprites()[0].rect.y += 5
 
-        #player attack
-        if keys[pygame.K_SPACE]:
-            if right:
-                player_group.sprites()[0].attack(True)
-            else:
-                player_group.sprites()[0].attack(False)
-        if not keys[pygame.K_SPACE]:
-            if right:
-                player_group.sprites()[0].flipPlayer(True)
-            else:
-                player_group.sprites()[0].flipPlayer(False)
-           
+
     
     #///////////////////////////#
     #if conditions are met and player exits screen through right side

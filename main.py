@@ -186,6 +186,7 @@ def musicPlayer(music,vol = 0.7,loop = 0,initialPlay = 0):
     #looping music
     pygame.mixer.music.play(loop)
 
+#building scenes
 def sceneBuilder(newScene):
     global current_img
     global current_rect

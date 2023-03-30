@@ -77,9 +77,12 @@ font = pygame.font.SysFont("arial", 30)
 player_group = pygame.sprite.Group()
 #creating mob sprite group
 mob_group = pygame.sprite.Group()
+#creating mob sprite group
+boss_group = pygame.sprite.Group()
 #boolean flags
 loadPlaying = True
 shopPlaying = False
+bossPlaying = False
 running = True
 #FPS
 FPS = 60
@@ -108,7 +111,12 @@ def initializeMobs():
     num_of_mobs = 5
     for x in range (num_of_mobs):
         mob_group.add(gameSprites.Mob("Skeleton\walktile000.png", 50, 50, [2,2]))
-        
+def initializeBoss():
+    global boss_group
+    num_of_mobs = 1
+    for x in range (num_of_mobs):
+        boss_group.add(gameSprites.Boss("mob.png", 50, 50, [3,3],50))
+
 #render images
 def render():
     #adding background image
@@ -137,9 +145,17 @@ def render():
             player_group.update()
         mob_group.draw(screen)
         player_group.draw(screen)
+
+        
+        if bossPlaying:
+            boss_group.update(player_group.sprites()[0].rect,mob_group)
+            boss_group.draw(screen)
+
+        if shopPlaying:
+            screen.blit(shopImg,shop_rect)
+
     
-    if shopPlaying:
-        screen.blit(shopImg,shop_rect)
+
 
     #checking if mouse is within game window
     if pygame.mouse.get_focused() == True and loadPlaying or shopPlaying:
@@ -183,20 +199,27 @@ def sceneBuilder(newScene):
         current_img = forestImg
         scene = 'forest'
     elif(newScene == 'cave'):
+
         current_img = caveImg
         scene = 'cave'
         musicPlayer('bossMusic.mp3', vol=0.3)
     elif(newScene == 'treasure'):
         current_img = treasureImg
+
+    
     current_rect = current_img.get_rect()
     initializePlayer()
     initializeMobs()
-    if scene == 'cave':
+    initializeBoss()
+    if scene == "cave":
         mob_group.empty()
         player_group.sprites()[0].rect.bottom = 170
         player_group.sprites()[0].rect.left = 260
+
+
         
 #Initalizing methods
+
 sceneBuilder("mainMenu")
 
 #collisionPicker
@@ -313,7 +336,11 @@ while running:
     #if conditions are met and player exits screen through right side
     if keys[pygame.K_c]:
         sceneBuilder('cave')
+        bossPlaying =True
+        #boss_group.sprites()[0].mobspawner(mob_group)
 
+    if keys[pygame.K_SPACE]:
+        boss_group.sprites()[0].mobspawner(mob_group) 
     #///////////////////////////#
 
     #///////////////////////////#

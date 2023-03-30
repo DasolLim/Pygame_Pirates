@@ -1,4 +1,4 @@
-import pygame,random
+import pygame,random, math
 
 bg_img = pygame.image.load('backgroundimage.png')
 bg_img = pygame.transform.scale(bg_img, (1280, 780))
@@ -151,22 +151,38 @@ class Mob(GameObject):
             self.image = pygame.transform.flip(self.image,True,False)
 
 class Boss(GameObject):
-    def __init__(self,img_path,health,damage,shield):
+    def __init__(self,img_path,health,damage,speed,shield):
+        super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery)
         self.shield = shield
-        super().__init__(img_path,health,damage)
+        self.speed = speed
 
-    def __tracker__(self, playerCord):
-        # Input code here to track player movement
-        playerCord=0
+    def update(self, player_rect,mob_group):
+        # Find direction vector (dx, dy) between enemy and player.
+        dx, dy = player_rect.x - self.rect.x, player_rect.y - self.rect.y
+        dist = math.hypot(dx, dy)
+        if(dist<125):
+            self.dash()
+        else:
+            dx, dy = dx / dist, dy / dist  # Normalize.
+            # Move along this normalized vector towards the player at current speed.
+            self.rect.x += dx * self.speed[0]
+            self.rect.y += dy * self.speed[0]
     
 
-    def __dash__(self, playerCord):
+    def dash(self):
         # Input code here to perform the boss dash towards the playerCord
         playerCord=0
     
-    def __mobSpawner__(self):
-        # Input code here for boss to spawn mobs around him
-        x=0
+    def mobspawner(self,mob_group):
+        for x in range (4):
+            mob_group.add(Mob("mob.png", 50, 50, [2,2]))
+        
+        position = len(mob_group)
+        mob_group.sprites()[position-4].rect.top = self.rect.bottom
+        mob_group.sprites()[position-3].rect.bottom = self.rect.top
+        mob_group.sprites()[position-2].rect.right = self.rect.left
+        mob_group.sprites()[position-1].rect.left = self.rect.right
+
 
 
 

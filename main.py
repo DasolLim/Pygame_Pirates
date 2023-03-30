@@ -339,7 +339,7 @@ while running:
         bossPlaying =True
         #boss_group.sprites()[0].mobspawner(mob_group)
 
-    if keys[pygame.K_SPACE]:
+    if keys[pygame.K_p]:
         boss_group.sprites()[0].mobspawner(mob_group) 
     #///////////////////////////#
 

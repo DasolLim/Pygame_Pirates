@@ -475,7 +475,7 @@ class Boss(GameObject):
     
     def mobspawner(self,mob_group):
         for x in range (4):
-            mob_group.add(Mob("mob.png", 50, 50, [2,2]))
+            mob_group.add(Mob("Skeleton\walktile000.png", 50, 50, [2,2]))
         
         position = len(mob_group)
         mob_group.sprites()[position-4].rect.top = self.rect.bottom

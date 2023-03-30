@@ -6,7 +6,6 @@ pygame.init()
 pygame.mixer.init()
 
 #//////////////////////////////////////Images//////////////////////////////////////#
-
 #initialize starting image
 mainmenu_image = pygame.image.load('backgroundimage.png')
 mainmenu_image = pygame.transform.scale(mainmenu_image, (1280, 780))
@@ -74,7 +73,6 @@ font = pygame.font.SysFont("arial", 30)
 #/////////////////////////////////////////////////////////////////////////#
 
 #//////////////////////////////////////Initialize Methods//////////////////////////////////////#
-
 #creating player sprite group
 player_group = pygame.sprite.Group()
 #creating mob sprite group
@@ -83,7 +81,6 @@ mob_group = pygame.sprite.Group()
 loadPlaying = True
 shopPlaying = False
 running = True
-dead = False
 #FPS
 FPS = 60
 #setting clock
@@ -185,17 +182,20 @@ def sceneBuilder(newScene):
     elif(newScene == 'forest'):
         current_img = forestImg
         scene = 'forest'
-        pygame.mixer.music.stop()
     elif(newScene == 'cave'):
         current_img = caveImg
         scene = 'cave'
-        pygame.mixer.music.stop()
+        musicPlayer('bossMusic.mp3', vol=0.3)
     elif(newScene == 'treasure'):
         current_img = treasureImg
     current_rect = current_img.get_rect()
     initializePlayer()
     initializeMobs()
-
+    if scene == 'cave':
+        mob_group.empty()
+        player_group.sprites()[0].rect.bottom = 170
+        player_group.sprites()[0].rect.left = 260
+        
 #Initalizing methods
 sceneBuilder("mainMenu")
 
@@ -211,8 +211,8 @@ def collisionPicker(scene):
             sprites.collisionForest()
     if scene == 'cave':
         player_group.sprites()[0].collisionCave()
-        for sprites in mob_group.sprites():
-            sprites.collisionCave()
+        # for sprites in mob_group.sprites():
+        #     sprites.collisionCave()
 render()
 # gameloop
 while running:
@@ -229,7 +229,7 @@ while running:
             (x, y) = pygame.mouse.get_pos()
 
             #//////Debug///////#
-            #print(x, y)
+            print(x, y)
             #//////////////////#
 
             #checking collide point of mouse with start button
@@ -254,19 +254,27 @@ while running:
         #spacebar click
         if keys[pygame.K_SPACE] and not loadPlaying and not shopPlaying:
             player_group.sprites()[0].attack()
+            for sprites in mob_group.sprites():
+                sprites.attack()
 
         #////////////////Change for hit animation////////////////////#
         if keys[pygame.K_h]:
             player_group.sprites()[0].hit()
+            for sprites in mob_group.sprites():
+                sprites.hit()
             dead = False
             player_group.sprites()[0].currentDeath = 0
             player_group.sprites()[0].isDeath = False
+            for sprites in mob_group.sprites():
+                sprites.currentDeath = 0
+                sprites.isDeath = False
         #////////////////////////////////////////////////////////////#
 
         #////////////////Change for death animation////////////////////#
         if keys[pygame.K_d]:
             player_group.sprites()[0].death()
-            dead = True
+            for sprites in mob_group.sprites():
+                sprites.death()
         #////////////////////////////////////////////////////////////#
 
         # CHANGE TO HAVE IT ON MOUSE PRESS INSIDE THE CONTINUE BUTTON / EXIT
@@ -276,7 +284,7 @@ while running:
             sceneBuilder("mainMenu")
 
     #player movement
-    if not shopPlaying and not dead:
+    if not shopPlaying and player_group.sprites()[0].isDeath == False:
         if keys[pygame.K_RIGHT]:
             # player_group.sprites()[0].flipPlayer(player_group.sprites()[0].direction)
             player_group.sprites()[0].walk()
@@ -293,8 +301,6 @@ while running:
         if keys[pygame.K_DOWN]:
             player_group.sprites()[0].walk()
             player_group.sprites()[0].rect.y += 5
-
-
     
     #///////////////////////////#
     #if conditions are met and player exits screen through right side

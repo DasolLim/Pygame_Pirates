@@ -201,7 +201,8 @@ def sceneBuilder(newScene):
         current_img = mainmenu_image
         musicPlayer('menuMusic.mp3',loop = -1, initialPlay=1)
     elif(newScene == 'beach'):
-        musicPlayer('pirateArr.mp3')
+        if stage == 0:
+            musicPlayer('pirateArr.mp3')
         current_img = beachImg
         scene = 'beach'
     elif(newScene == 'forest'):
@@ -368,14 +369,18 @@ while running:
     #advancing to next stage
     if not mob_group and not boss_group and not scene == 'treasure':
         if player_group.sprites()[0].rect.right >= screen_rect.right:
-            if stage == 0:
+            if stage < 1:
+                stage += 1
+                sceneBuilder('beach')
+            elif stage < 3:
                 sceneBuilder('forest')
-            elif stage == 1:
+                stage += 1
+            elif stage == 3:
                 sceneBuilder('cave')
+                stage += 1
             else:
                 sceneBuilder('treasure')
                 win = True
-            stage += 1
 
     #player boundaries
     collisionPicker(scene)

@@ -93,7 +93,6 @@ scene = 'beach'
 #initializing counts
 coinCount = 0
 healthCount = 50
-
 #initializing player sprite
 def initializePlayer():
     global player_group
@@ -102,21 +101,22 @@ def initializePlayer():
     num_of_player = 1
     for x in range (num_of_player):
         player_group.add(gameSprites.Player("Pirate/1_entity_000_IDLE_000.png", 50, 50, 0, 0))
-
 #initializing mob sprite
 def initializeMobs():
     global mob_group
     if mob_group:
         mob_group.empty()
-    num_of_mobs = 5
-    for x in range (num_of_mobs):
-        mob_group.add(gameSprites.Mob("Skeleton\walktile000.png", 50, 50, [2,2]))
+    num_of_mobs1 = 5
+    num_of_mobs2 = 5
+    for x in range (num_of_mobs1):
+        mob_group.add(gameSprites.Mob1("Skeleton\walktile000.png", 50, 50, [2,2]))
+    for x in range (num_of_mobs2):
+        mob_group.add(gameSprites.Mob2("Goblin/runtile000.png", 50, 50, [2,2]))
 def initializeBoss():
     global boss_group
     num_of_mobs = 1
     for x in range (num_of_mobs):
-        boss_group.add(gameSprites.Boss("Skeleton\walktile000.png", 50, 50, [3,3],50))
-
+        boss_group.add(gameSprites.Boss("Boss\walktile000.png", 50, 50, [3,3],50))
 #render images
 def render():
     #adding background image
@@ -145,25 +145,20 @@ def render():
             player_group.update()
         mob_group.draw(screen)
         player_group.draw(screen)
-
-        
+        #displaying boss
         if bossPlaying:
             boss_group.update(player_group.sprites()[0].rect,mob_group)
             boss_group.draw(screen)
-
+        #displaying shop
         if shopPlaying:
             screen.blit(shopImg,shop_rect)
-
-    
-
-
     #checking if mouse is within game window
     if pygame.mouse.get_focused() == True and loadPlaying or shopPlaying:
+        None
         #adding mouse image to screen
-        screen.blit(cursor_img,pygame.mouse.get_pos())
+    screen.blit(cursor_img,pygame.mouse.get_pos())
     #refreshing screen
     pygame.display.flip()
-
 #musicPlayer
 def musicPlayer(music,vol = 0.7,loop = 0,initialPlay = 0):
     #checking initial play
@@ -179,7 +174,6 @@ def musicPlayer(music,vol = 0.7,loop = 0,initialPlay = 0):
     pygame.mixer.music.set_volume(vol)
     #looping music
     pygame.mixer.music.play(loop)
-
 #building the scenes
 def sceneBuilder(newScene):
     global current_img
@@ -199,29 +193,21 @@ def sceneBuilder(newScene):
         current_img = forestImg
         scene = 'forest'
     elif(newScene == 'cave'):
-
         current_img = caveImg
         scene = 'cave'
         musicPlayer('bossMusic.mp3', vol=0.3)
     elif(newScene == 'treasure'):
         current_img = treasureImg
-
-    
     current_rect = current_img.get_rect()
     initializePlayer()
     initializeMobs()
-    initializeBoss()
     if scene == "cave":
         mob_group.empty()
         player_group.sprites()[0].rect.bottom = 170
         player_group.sprites()[0].rect.left = 260
-
-
-        
-#Initalizing methods
-
+        initializeBoss()
+#Initalizing main menu
 sceneBuilder("mainMenu")
-
 #collisionPicker
 def collisionPicker(scene):
     if scene == 'beach':
@@ -234,8 +220,8 @@ def collisionPicker(scene):
             sprites.collisionForest()
     if scene == 'cave':
         player_group.sprites()[0].collisionCave()
-        # for sprites in mob_group.sprites():
-        #     sprites.collisionCave()
+        for sprites in mob_group.sprites():
+            sprites.collisionCave()
 render()
 # gameloop
 while running:
@@ -259,8 +245,7 @@ while running:
             if startRect.collidepoint(x, y) and loadPlaying:
                 loadPlaying=False
                 sceneBuilder('beach')
-
-                            
+    
             #checking collide point of mouse with exit button
             if exitRect.collidepoint(x, y) and loadPlaying:
                 running = False
@@ -336,14 +321,11 @@ while running:
     #if conditions are met and player exits screen through right side
     if keys[pygame.K_c]:
         sceneBuilder('cave')
-        bossPlaying =True
-        #boss_group.sprites()[0].mobspawner(mob_group)
+        bossPlaying = True
 
     if keys[pygame.K_p]:
         boss_group.sprites()[0].mobspawner(mob_group) 
-    #///////////////////////////#
-
-    #///////////////////////////#
+    
     #if conditions are met for game completion
     if keys[pygame.K_t]:
         sceneBuilder('treasure')

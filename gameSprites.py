@@ -1,4 +1,4 @@
-import pygame,random, math
+import pygame,random, math, time
 
 bg_img = pygame.image.load('backgroundimage.png')
 bg_img = pygame.transform.scale(bg_img, (1280, 780))
@@ -713,19 +713,18 @@ class Boss(GameObject):
         #////////////////////////////////Animations//////////////////////////////////////////#
 
     def update(self, player_rect,mob_group):
-        if not self.isDeath == True:
-            # Find direction vector (dx, dy) between enemy and player.
-            dx, dy = player_rect.x - self.rect.x, player_rect.y - self.rect.y
-            dist = math.hypot(dx, dy)
-            if(dist<125):
-                self.dash()
-                self.isWalking = False
-            else:
-                self.isWalking = True
-                dx, dy = dx / dist, dy / dist  # Normalize.
-                # Move along this normalized vector towards the player at current speed.
-                self.rect.x += dx * self.speed[0]
-                self.rect.y += dy * self.speed[0]
+        # Find direction vector (dx, dy) between enemy and player.
+        dx, dy = player_rect.x - self.rect.x, player_rect.y - self.rect.y
+        dist = math.hypot(dx, dy)
+        if(dist<125):
+            dx, dy = dx / dist, dy / dist
+            self.dash()
+        else:
+            dx, dy = dx / dist, dy / dist  # Normalize.
+            # Move along this normalized vector towards the player at current speed.
+            self.rect.x += dx * self.speed[0]
+            self.rect.y += dy * self.speed[0]
+                
             if player_rect.centerx < self.rect.centerx:
                 self.direction = 'l'
             else:
@@ -777,16 +776,15 @@ class Boss(GameObject):
     def attack(self):
         self.isAttacking = True
     #hit
-    def hit(self):
-        self.isHit = True
+    def idle(self):
+        self.isIdle = True
     #death
     def death(self):
         self.isDeath = True
     #////////////////////////////////Animations//////////////////////////////////////////#
     
     def dash(self):
-        # Input code here to perform the boss dash towards the playerCord
-        playerCord=0
+        None
     
     def mobspawner(self,mob_group):
         for x in range (4):
@@ -797,6 +795,8 @@ class Boss(GameObject):
         mob_group.sprites()[1].rect.bottom = self.rect.top
         mob_group.sprites()[2].rect.right = self.rect.left
         mob_group.sprites()[3].rect.left = self.rect.right
+
+    
 
 
 

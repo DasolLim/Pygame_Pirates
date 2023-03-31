@@ -356,6 +356,8 @@ while running:
     if not pygame.mixer.music.get_busy():
         musicPlayer('levelMusic.mp3', 0.01, -1)
 
+    
+
 
 #exiting pygame    
 pygame.quit()

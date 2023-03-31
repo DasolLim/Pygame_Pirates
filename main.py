@@ -38,6 +38,13 @@ forest_rect = forestImg.get_rect()
 caveImg = pygame.image.load('caveScene.png')
 caveImg = pygame.transform.scale(caveImg,(1280,780))
 cave_rect = caveImg.get_rect()
+#arrow image
+arrowImg = pygame.image.load('arrow.png')
+arrowImg = pygame.transform.scale(arrowImg,(150,100))
+arrow_rect = arrowImg.get_rect()
+arrow_rect.right = screen_rect.right
+arrow_rect.centery = screen_rect.centery
+
 #initialize shop scene
 shopImg = pygame.image.load('menu.png')
 shopImg = pygame.transform.scale(shopImg,(750,750))
@@ -86,6 +93,7 @@ shopPlaying = False
 bossPlaying = False
 running = True
 win = False
+stage = 0
 #FPS
 FPS = 60
 #setting clock
@@ -112,8 +120,9 @@ def initializeMobs():
     num_of_mobs2 = 5
     for x in range (num_of_mobs1):
         mob_group.add(gameSprites.Mob1("Skeleton\walktile000.png", 50, 50, [2,2]))
-    for x in range (num_of_mobs2):
-        mob_group.add(gameSprites.Mob2("Goblin/runtile000.png", 50, 50, [2,2]))
+    if scene == 'forest':
+        for x in range (num_of_mobs2):
+            mob_group.add(gameSprites.Mob2("Goblin/runtile000.png", 50, 50, [2.5,2.5]))
 def initializeBoss():
     global boss_group
     num_of_mobs = 1
@@ -123,6 +132,8 @@ def initializeBoss():
 def render():
     #adding background image
     screen.blit(current_img,current_rect)
+    if not mob_group and not boss_group and not scene == 'treasure':
+        screen.blit(arrowImg,arrow_rect)
     #checking if on start screen
     if not loadPlaying:
         #initializing coin text
@@ -182,6 +193,7 @@ def sceneBuilder(newScene):
     global current_img
     global current_rect
     global scene
+    global bossPlaying
     if(newScene == 'shop'):
         musicPlayer('shopMusic.mp3', 0.1, -1)
         return 
@@ -201,6 +213,7 @@ def sceneBuilder(newScene):
         musicPlayer('bossMusic.mp3', vol=0.3)
     elif(newScene == 'treasure'):
         current_img = treasureImg
+        scene = 'treasure'
     current_rect = current_img.get_rect()
     initializePlayer()
     initializeMobs()
@@ -209,6 +222,7 @@ def sceneBuilder(newScene):
         player_group.sprites()[0].rect.bottom = 170
         player_group.sprites()[0].rect.left = 260
         initializeBoss()
+        bossPlaying = True
     elif newScene == 'treasure':
         mob_group.empty()
         boss_group.empty()
@@ -297,6 +311,11 @@ while running:
                 sprites.death()
         #////////////////////////////////////////////////////////////#
 
+        if keys[pygame.K_4]:
+            mob_group.empty()
+            boss_group.empty()
+
+
         # CHANGE TO HAVE IT ON MOUSE PRESS INSIDE THE CONTINUE BUTTON / EXIT
         if keys[pygame.K_9] and shopPlaying:
             shopPlaying = False
@@ -345,6 +364,18 @@ while running:
 
     if keys[pygame.K_b]:
         sceneBuilder('beach')
+
+    #advancing to next stage
+    if not mob_group and not boss_group and not scene == 'treasure':
+        if player_group.sprites()[0].rect.right >= screen_rect.right:
+            if stage == 0:
+                sceneBuilder('forest')
+            elif stage == 1:
+                sceneBuilder('cave')
+            else:
+                sceneBuilder('treasure')
+                win = True
+            stage += 1
 
     #player boundaries
     collisionPicker(scene)

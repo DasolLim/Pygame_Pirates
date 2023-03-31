@@ -240,7 +240,7 @@ class Mob1(GameObject):
                 self.speed[i] = -self.speed[i]
 
         # Spawn mob at random y value
-        rand_y = random.randint(50,1230)
+        rand_y = random.randint(50,528 - 50)
 
         #////////////////////////////////Animations//////////////////////////////////////////#
         #for walking animation
@@ -789,12 +789,21 @@ class Boss(GameObject):
     def mobspawner(self,mob_group):
         for x in range (4):
             mob_group.add(Mob1("Skeleton\walktile000.png", 50, 50, [2,2]))
-        
-        #position = len(mob_group)
-        mob_group.sprites()[0].rect.top = self.rect.bottom
-        mob_group.sprites()[1].rect.bottom = self.rect.top
-        mob_group.sprites()[2].rect.right = self.rect.left
-        mob_group.sprites()[3].rect.left = self.rect.right
+        position = len(mob_group)
+       # mob_group.sprites()[position-4].rect.top = self.rect.bottom
+        mob_group.sprites()[position-4].rect.center = self.rect.center
+        mob_group.sprites()[position-4].speed = [3,3]
+       # mob_group.sprites()[position-3].rect.bottom = self.rect.top
+        mob_group.sprites()[position-3].rect.center = self.rect.center
+        mob_group.sprites()[position-3].speed = [-3,3]
+        mob_group.sprites()[position-3].direction = 'l'
+       # mob_group.sprites()[position-2].rect.right = self.rect.left
+        mob_group.sprites()[position-2].rect.center = self.rect.center
+        mob_group.sprites()[position-2].speed = [3,-3]
+       # mob_group.sprites()[position-1].rect.left = self.rect.right
+        mob_group.sprites()[position-1].rect.center = self.rect.center
+        mob_group.sprites()[position-1].speed = [-3,-3]
+        mob_group.sprites()[position-1].direction = 'l'
 
     
 

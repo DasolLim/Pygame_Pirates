@@ -44,7 +44,7 @@ shopImg = pygame.transform.scale(shopImg,(750,750))
 shop_rect = shopImg.get_rect()
 shop_rect.center = screen_rect.center
 #initializing treasure scene
-treasureImg = pygame.image.load('treasure.jpg')
+treasureImg = pygame.image.load('Win.jpg')
 treasureImg = pygame.transform.scale(treasureImg,(1280,780))
 treasure_rect = treasureImg.get_rect()
 #initializing coin image
@@ -62,6 +62,7 @@ height = 135
 startRect = pygame.Rect(415, 225, width, height)
 #creating rectangle for exit button
 exitRect = pygame.Rect(415, 425, width, height)
+exitRectFinal = pygame.Rect(882,637,334,91)
 #initializing font
 pygame.font.init()
 font = pygame.font.SysFont("arial", 30)
@@ -84,6 +85,7 @@ loadPlaying = True
 shopPlaying = False
 bossPlaying = False
 running = True
+win = False
 #FPS
 FPS = 60
 #setting clock
@@ -131,20 +133,22 @@ def render():
         global healthCount
         healthCount = player_group.sprites()[0].health
         healthCountText = font.render(str(healthCount), False, (255, 255, 255))
-        #displaying coin/health background
-        screen.blit(textBackground_image, (1125,570))
-        #displaying coin info
-        screen.blit(coinCountText, (1230, 730))
-        screen.blit(coinImg, (1160, 720))
-        #displaying heart info
-        screen.blit(healthCountText, (1230, 680))
-        screen.blit(heartImg, (1160, 665))
+        if not win:
+            #displaying coin/health background
+            screen.blit(textBackground_image, (1125,570))
+            #displaying coin info
+            screen.blit(coinCountText, (1230, 730))
+            screen.blit(coinImg, (1160, 720))
+            #displaying heart info
+            screen.blit(healthCountText, (1230, 680))
+            screen.blit(heartImg, (1160, 665))
         #displaying player & mobs
         if not shopPlaying:
             mob_group.update()
             player_group.update()
         mob_group.draw(screen)
-        player_group.draw(screen)
+        if not win:
+            player_group.draw(screen)
         #displaying boss
         if bossPlaying:
             boss_group.update(player_group.sprites()[0].rect,mob_group)
@@ -153,10 +157,9 @@ def render():
         if shopPlaying:
             screen.blit(shopImg,shop_rect)
     #checking if mouse is within game window
-    if pygame.mouse.get_focused() == True and loadPlaying or shopPlaying:
-        None
+    if pygame.mouse.get_focused() == True and loadPlaying or shopPlaying or win:
         #adding mouse image to screen
-    screen.blit(cursor_img,pygame.mouse.get_pos())
+        screen.blit(cursor_img,pygame.mouse.get_pos())
     #refreshing screen
     pygame.display.flip()
 #musicPlayer
@@ -201,11 +204,14 @@ def sceneBuilder(newScene):
     current_rect = current_img.get_rect()
     initializePlayer()
     initializeMobs()
-    if scene == "cave":
+    if newScene == "cave":
         mob_group.empty()
         player_group.sprites()[0].rect.bottom = 170
         player_group.sprites()[0].rect.left = 260
         initializeBoss()
+    elif newScene == 'treasure':
+        mob_group.empty()
+        boss_group.empty()
 #Initalizing main menu
 sceneBuilder("mainMenu")
 #collisionPicker
@@ -222,6 +228,8 @@ def collisionPicker(scene):
         player_group.sprites()[0].collisionCave()
         for sprites in mob_group.sprites():
             sprites.collisionCave()
+    if scene == 'treasure':
+        None
 render()
 # gameloop
 while running:
@@ -248,6 +256,10 @@ while running:
     
             #checking collide point of mouse with exit button
             if exitRect.collidepoint(x, y) and loadPlaying:
+                running = False
+
+            #ending game
+            if exitRectFinal.collidepoint(x, y) and win:
                 running = False
 
         #open shop eventwith escape
@@ -329,6 +341,7 @@ while running:
     #if conditions are met for game completion
     if keys[pygame.K_t]:
         sceneBuilder('treasure')
+        win = True
 
     if keys[pygame.K_b]:
         sceneBuilder('beach')
@@ -342,6 +355,7 @@ while running:
     #begining level music
     if not pygame.mixer.music.get_busy():
         musicPlayer('levelMusic.mp3', 0.01, -1)
+
 
 #exiting pygame    
 pygame.quit()

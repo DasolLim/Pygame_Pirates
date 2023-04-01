@@ -199,7 +199,7 @@ def initializePlayer():
 
     for x in range(num_of_player):
         player_group.add(gameSprites.Player(
-            "Pirate/1_entity_000_IDLE_000.png", 50, 50, 0, 100))
+            "Pirate/1_entity_000_IDLE_000.png", 50, 10, 0, 100))
     global player
     player = player_group.sprites()[0]
 # initializing mob sprite
@@ -214,11 +214,11 @@ def initializeMobs():
     num_of_mobs2 = 5
     for x in range(num_of_mobs1):
         mob_group.add(gameSprites.Mob1(
-            "Skeleton\walktile000.png", 50, 50, [2, 2]))
+            "Skeleton\walktile000.png", 50, 10, [2, 2]))
     if scene == 'forest':
         for x in range(num_of_mobs2):
             mob_group.add(gameSprites.Mob2(
-                "Goblin/runtile000.png", 50, 50, [2.5, 2.5]))
+                "Goblin/runtile000.png", 50, 10, [2.5, 2.5]))
 
 
 def initializeBoss():
@@ -226,7 +226,7 @@ def initializeBoss():
     num_of_mobs = 1
     for x in range(num_of_mobs):
         boss_group.add(gameSprites.Boss(
-            "Boss\walktile000.png", 50, 50, [3, 3], 50))
+            "Boss\walktile000.png", 50, 10, [3, 3], 50))
 
 # render images
 
@@ -262,7 +262,7 @@ def render():
             player_group.draw(screen)
         # displaying player & mobs
         if not shopPlaying:
-            mob_group.update(mob_group)
+            mob_group.update(mob_group, player_group.sprites()[0])
             player_group.update()
         mob_group.draw(screen)
 
@@ -307,7 +307,8 @@ def render():
                 screen.blit(luckDescript, (490, 540))
 
         if bossPlaying:
-            boss_group.update(player_group.sprites()[0].rect, boss_group, mob_group)
+            boss_group.update(player_group.sprites()[
+                              0].rect, boss_group, mob_group, player_group.sprites()[0])
             boss_group.draw(screen)
 
     # checking if mouse is within game window
@@ -319,7 +320,7 @@ def render():
 # musicPlayer
 
 
-def musicPlayer(music, vol=0.7, loop=0, initialPlay=0):
+def musicPlayer(music, vol=0.2, loop=0, initialPlay=0):
     # checking initial play
 
     if initialPlay:
@@ -345,7 +346,7 @@ def sceneBuilder(newScene):
 
     global bossPlaying
     if (newScene == 'shop'):
-        musicPlayer('Music/shopMusic.mp3', 0.1, -1)
+        musicPlayer('Music/shopMusic.mp3', loop=-1)
         return
     if (newScene == 'mainMenu'):
         current_img = mainmenu_image
@@ -371,12 +372,12 @@ def sceneBuilder(newScene):
     current_rect = current_img.get_rect()
     initializePlayer()
     initializeMobs()
+    initializeBoss()
 
     if newScene == "cave":
         mob_group.empty()
         player_group.sprites()[0].rect.bottom = 170
         player_group.sprites()[0].rect.left = 260
-        initializeBoss()
         bossPlaying = True
     elif newScene == 'treasure':
         mob_group.empty()
@@ -409,35 +410,44 @@ def collisionPicker(scene):
 extra_distance = 0
 
 # player/mob collisions
-
-
 def collisions():
-    if player_group.sprites()[0].isAttacking:
-        myDict = pygame.sprite.groupcollide(
-            player_group, mob_group, False, False)
+    myDict = pygame.sprite.groupcollide(
+        player_group, mob_group, False, False)
+    if myDict:
+        hitMobs = myDict.get(player_group.sprites()[0])
+    if player_group.sprites()[0].isAttacking and myDict:
         # #game logic
-        if myDict:
-            hitMobs = myDict.get(player_group.sprites()[0])
-            for x in hitMobs:
-                if x.type == "goblin":
-                    global extra_distance
-                    extra_distance = 70
-
-                else:
-                    extra_distance = 0
-                if player_group.sprites()[0].direction == 'r' and player_group.sprites()[0].rect.centerx+extra_distance < x.rect.right:
-                    x.death()
-                    if not x.isDeath:
-                        mob_group.remove(x)
-
-                if player_group.sprites()[0].direction == 'l' and player_group.sprites()[0].rect.centerx-extra_distance > x.rect.left:
-                    x.death()
-                    if not x.isDeath:
-                        mob_group.remove(x)
+        for x in hitMobs:
+            if x.type == "goblin":
+                global extra_distance
+                extra_distance = 70
+            else:
+                extra_distance = 0
+            if player_group.sprites()[0].direction == 'r' and player_group.sprites()[0].rect.centerx+extra_distance < x.rect.right:
+                x.playerDamage = player_group.sprites()[0].damage
+                x.hit()
+            elif player_group.sprites()[0].direction == 'l' and player_group.sprites()[0].rect.centerx-extra_distance > x.rect.left:
+                x.playerDamage = player_group.sprites()[0].damage
+                x.hit()
+    if myDict:
+        for x in hitMobs:
+            if player_group.sprites()[0].direction == 'r' and x.direction == 'r' and x.rect.right < player_group.sprites()[0].rect.right:
+                x.attack()
+            elif player_group.sprites()[0].direction == 'l' and x.direction == 'l' and x.rect.left > player_group.sprites()[0].rect.left:
+                x.attack()
+    myDict = pygame.sprite.groupcollide(
+        player_group, boss_group, False, False)
+    if myDict:
+        hitBoss = myDict.get(player_group.sprites()[0])
+    if boss_group and boss_group.sprites()[0].isIdle and myDict and player_group.sprites()[0].isAttacking:
+        for x in hitBoss:
+            x.playerDamage = player_group.sprites()[0].damage
+            x.hit()
+    if boss_group and pygame.sprite.collide_rect(player,boss_group.sprites()[0]) and boss_group.sprites()[0].framecount == 20:
+        player.health -= boss_group.sprites()[0].damage
+        player.hit()
 
 # Reset shop upgrades
-
-
 def resetShop():
     shopUpgradeRects[0].width = 0
     shopUpgradeRects[1].width = 0

@@ -7,14 +7,14 @@ pygame.mixer.init()
 
 #//////////////////////////////////////Images//////////////////////////////////////#
 #initialize starting image
-mainmenu_image = pygame.image.load('backgroundimage.png')
+mainmenu_image = pygame.image.load('Scenes/backgroundimage.png')
 mainmenu_image = pygame.transform.scale(mainmenu_image, (1280, 780))
 mainmenu_rect = mainmenu_image.get_rect()
 #initializing current image
 current_img = None
 current_rect = None
 #initialize cursor image
-cursor_img = pygame.image.load('cursor.png')
+cursor_img = pygame.image.load('Scenes/cursor.png')
 cursor_img = pygame.transform.scale(cursor_img,(25,25))
 cursor_rect = cursor_img.get_rect()
 pygame.mouse.set_visible(False)
@@ -22,44 +22,44 @@ pygame.mouse.set_visible(False)
 screen = pygame.display.set_mode((mainmenu_rect.width, mainmenu_rect.height))
 screen_rect = screen.get_rect()
 #initialize text background
-textBackground_image = pygame.image.load('textBackground.png')
+textBackground_image = pygame.image.load('Scenes/textBackground.png')
 textBackground_image = pygame.transform.scale(textBackground_image, (300,860))
 textBackground_rect = textBackground_image.get_rect()
 textBackground_rect.bottomright = screen_rect.bottomright
 #initialize beach scene
-beachImg = pygame.image.load('sceneimage.png')
+beachImg = pygame.image.load('Scenes/sceneimage.png')
 beachImg = pygame.transform.scale(beachImg, (1280, 780))
 beach_rect = beachImg.get_rect()
 #initialize forest scene
-forestImg = pygame.image.load('forestScene.png')
+forestImg = pygame.image.load('Scenes/forestScene.png')
 forestImg = pygame.transform.scale(forestImg,(1280,780))
 forest_rect = forestImg.get_rect()
 #initialize cave image
-caveImg = pygame.image.load('caveScene.png')
+caveImg = pygame.image.load('Scenes/caveScene.png')
 caveImg = pygame.transform.scale(caveImg,(1280,780))
 cave_rect = caveImg.get_rect()
 #arrow image
-arrowImg = pygame.image.load('arrow.png')
+arrowImg = pygame.image.load('Scenes/arrow.png')
 arrowImg = pygame.transform.scale(arrowImg,(150,100))
 arrow_rect = arrowImg.get_rect()
 arrow_rect.right = screen_rect.right
 arrow_rect.centery = screen_rect.centery
 
 #initialize shop scene
-shopImg = pygame.image.load('menu.png')
+shopImg = pygame.image.load('Scenes/menu.png')
 shopImg = pygame.transform.scale(shopImg,(750,750))
 shop_rect = shopImg.get_rect()
 shop_rect.center = screen_rect.center
 #initializing treasure scene
-treasureImg = pygame.image.load('Win.jpg')
+treasureImg = pygame.image.load('Scenes/Win.jpg')
 treasureImg = pygame.transform.scale(treasureImg,(1280,780))
 treasure_rect = treasureImg.get_rect()
 #initializing coin image
-coinImg = pygame.image.load('coin_100x94.png')
+coinImg = pygame.image.load('Scenes/coin_100x94.png')
 coinImg = pygame.transform.scale(coinImg, (65,65))
 coin_rect = coinImg.get_rect()
 #initializing heart image
-heartImg = pygame.image.load('Heart.png')
+heartImg = pygame.image.load('Scenes/Heart.png')
 heartImg = pygame.transform.scale(heartImg, (65,65))
 heart_rect = heartImg.get_rect()
 #defining width/height of buttons
@@ -83,6 +83,7 @@ font = pygame.font.SysFont("arial", 30)
 #//////////////////////////////////////Initialize Methods//////////////////////////////////////#
 #creating player sprite group
 player_group = pygame.sprite.Group()
+player = ""
 #creating mob sprite group
 mob_group = pygame.sprite.Group()
 #creating mob sprite group
@@ -111,6 +112,8 @@ def initializePlayer():
     num_of_player = 1
     for x in range (num_of_player):
         player_group.add(gameSprites.Player("Pirate/1_entity_000_IDLE_000.png", 50, 50, 0, 0))
+    global player
+    player = player_group.sprites()[0]
 #initializing mob sprite
 def initializeMobs():
     global mob_group
@@ -155,14 +158,14 @@ def render():
             screen.blit(heartImg, (1160, 665))
         #displaying player & mobs
         if not shopPlaying:
-            mob_group.update()
+            mob_group.update(mob_group)
             player_group.update()
         mob_group.draw(screen)
         if not win:
             player_group.draw(screen)
         #displaying boss
         if bossPlaying:
-            boss_group.update(player_group.sprites()[0].rect,mob_group)
+            boss_group.update(player_group.sprites()[0].rect)
             boss_group.draw(screen)
         #displaying shop
         if shopPlaying:
@@ -195,14 +198,14 @@ def sceneBuilder(newScene):
     global scene
     global bossPlaying
     if(newScene == 'shop'):
-        musicPlayer('shopMusic.mp3', 0.1, -1)
+        musicPlayer('Music/shopMusic.mp3', 0.1, -1)
         return 
     if(newScene == 'mainMenu'):
         current_img = mainmenu_image
-        musicPlayer('menuMusic.mp3',loop = -1, initialPlay=1)
+        musicPlayer('Music/menuMusic.mp3',loop = -1, initialPlay=1)
     elif(newScene == 'beach'):
         if stage == 0:
-            musicPlayer('pirateArr.mp3')
+            musicPlayer('Music/pirateArr.mp3')
         current_img = beachImg
         scene = 'beach'
     elif(newScene == 'forest'):
@@ -211,7 +214,7 @@ def sceneBuilder(newScene):
     elif(newScene == 'cave'):
         current_img = caveImg
         scene = 'cave'
-        musicPlayer('bossMusic.mp3', vol=0.3)
+        musicPlayer('Music/bossMusic.mp3', vol=0.3)
     elif(newScene == 'treasure'):
         current_img = treasureImg
         scene = 'treasure'
@@ -245,6 +248,45 @@ def collisionPicker(scene):
             sprites.collisionCave()
     if scene == 'treasure':
         None
+extra_distance = 0
+
+#player/mob collisions
+def collisions():
+    if player_group.sprites()[0].isAttacking:
+        myDict = pygame.sprite.groupcollide(player_group,mob_group,False,False)
+        # #game logic
+        if myDict:
+            hitMobs = myDict.get(player_group.sprites()[0])
+            for x in hitMobs:
+                if x.type == "goblin":
+                    global extra_distance
+                    extra_distance = 70
+                    
+                else:
+                    extra_distance = 0
+                if player_group.sprites()[0].direction == 'r' and player_group.sprites()[0].rect.centerx+extra_distance < x.rect.right:
+                    x.death()
+                    if not x.isDeath:
+                       mob_group.remove(x)
+        
+                if player_group.sprites()[0].direction == 'l' and player_group.sprites()[0].rect.centerx-extra_distance > x.rect.left:
+                    x.death()
+                    if not x.isDeath:
+                       mob_group.remove(x)
+
+    
+        
+        
+
+
+
+
+
+        
+
+        
+
+
 render()
 # gameloop
 while running:
@@ -289,8 +331,8 @@ while running:
         #spacebar click
         if keys[pygame.K_SPACE] and not loadPlaying and not shopPlaying:
             player_group.sprites()[0].attack()
-            for sprites in mob_group.sprites():
-                sprites.attack()
+            # for sprites in mob_group.sprites():
+            #     sprites.attack()
 
         #////////////////Change for hit animation////////////////////#
         if keys[pygame.K_h]:
@@ -382,15 +424,18 @@ while running:
                 sceneBuilder('treasure')
                 win = True
 
+
     #player boundaries
     collisionPicker(scene)
+
+    collisions()
 
     #render
     render()
 
     #begining level music
     if not pygame.mixer.music.get_busy():
-        musicPlayer('levelMusic.mp3', 0.01, -1)
+        musicPlayer('Music/levelMusic.mp3', 0.01, -1)
 
     
 

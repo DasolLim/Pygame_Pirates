@@ -1,6 +1,6 @@
-import pygame,random, math, time
+import pygame,random, math
 
-bg_img = pygame.image.load('backgroundimage.png')
+bg_img = pygame.image.load('Scenes/backgroundimage.png')
 bg_img = pygame.transform.scale(bg_img, (1280, 780))
 bg_rect = bg_img.get_rect()
 waterRect = pygame.Rect(0, 523, 1280, 500)
@@ -228,6 +228,8 @@ class Mob1(GameObject):
         self.speed = speed
         random_side = random.choice([-1,1])
         self.direction = 'r'
+        self.type = "skeleton"
+
 
         # Deciding whether the mob will spawn the left or right
         if random_side == -1: # Left
@@ -336,7 +338,7 @@ class Mob1(GameObject):
         #////////////////////////////////Animations//////////////////////////////////////////#
         super().__init__(img_path,health,damage, rand_x,rand_y)
     #updating
-    def update(self):
+    def update(self, mob_group):
         if not self.isDeath == True and not self.isHit == True and not self.isAttacking == True:
             self.rect.x = self.rect.x + self.speed[0]
             self.rect.y = self.rect.y + self.speed[1]
@@ -376,7 +378,8 @@ class Mob1(GameObject):
             self.currentDeath += 0.4
             if self.currentDeath >= len(self.deathLeftSprites):
                 self.currentDeath = len(self.deathLeftSprites) - 1
-                # self.isDeath = False
+                self.isDeath = False
+                self.selfRemove(mob_group)
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
             else:
@@ -394,7 +397,10 @@ class Mob1(GameObject):
     def death(self):
         self.isDeath = True
     #////////////////////////////////Animations//////////////////////////////////////////#
-        
+
+    def selfRemove(self, mob_group):
+        mob_group.remove(self)
+
     #///////////////////////////////Collisions//////////////////////////////////////////#
     def collisionBeach(self):
         if self.rect.left < bg_rect.left:
@@ -464,6 +470,7 @@ class Mob2(GameObject):
         self.speed = speed
         random_side = random.choice([-1,1])
         self.direction = 'r'
+        self.type = "goblin"
 
         # Deciding whether the mob will spawn the left or right
         if random_side == -1: # Left
@@ -542,7 +549,7 @@ class Mob2(GameObject):
         #////////////////////////////////Animations//////////////////////////////////////////#
         super().__init__(img_path,health,damage, rand_x,rand_y)
     #updating
-    def update(self):
+    def update(self,mob_group):
         if not self.isDeath == True and not self.isHit == True and not self.isAttacking == True:
             self.rect.x = self.rect.x + self.speed[0]
             self.rect.y = self.rect.y + self.speed[1]
@@ -579,16 +586,19 @@ class Mob2(GameObject):
                 self.image = self.hitLeftSprites[int(self.currentHit)]
         #death
         if self.isDeath == True:
-            self.currentDeath += 0.4
+            self.currentDeath += 0.2
             if self.currentDeath >= len(self.deathLeftSprites):
                 self.currentDeath = len(self.deathLeftSprites) - 1
-                # self.isDeath = False
+                self.isDeath = False
+                self.selfRemove(mob_group)
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
             else:
                 self.image = self.deathLeftSprites[int(self.currentDeath)]
         #////////////////////////////////Animations//////////////////////////////////////////#
-
+        
+    def selfRemove(self, mob_group):
+        mob_group.remove(self)
     #////////////////////////////////Animations//////////////////////////////////////////#
     #attacking
     def attack(self):
@@ -712,18 +722,17 @@ class Boss(GameObject):
         self.isDeath = False
         #////////////////////////////////Animations//////////////////////////////////////////#
 
-    def update(self, player_rect,mob_group):
+    def update(self, player_rect):
         # Find direction vector (dx, dy) between enemy and player.
         dx, dy = player_rect.x - self.rect.x, player_rect.y - self.rect.y
         dist = math.hypot(dx, dy)
         if(dist<125):
-            dx, dy = dx / dist, dy / dist
             self.dash()
         else:
             dx, dy = dx / dist, dy / dist  # Normalize.
             # Move along this normalized vector towards the player at current speed.
             self.rect.x += dx * self.speed[0]
-            self.rect.y += dy * self.speed[0]
+            self.rect.y += dy * self.speed[1]
                 
             if player_rect.centerx < self.rect.centerx:
                 self.direction = 'l'

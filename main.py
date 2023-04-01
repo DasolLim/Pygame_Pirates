@@ -165,7 +165,7 @@ def render():
             player_group.draw(screen)
         #displaying boss
         if bossPlaying:
-            boss_group.update(player_group.sprites()[0].rect, boss_group)
+            boss_group.update(player_group.sprites()[0].rect, boss_group, mob_group)
             boss_group.draw(screen)
         #displaying shop
         if shopPlaying:

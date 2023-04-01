@@ -45,6 +45,65 @@ arrow_rect = arrowImg.get_rect()
 arrow_rect.right = screen_rect.right
 arrow_rect.centery = screen_rect.centery
 
+
+
+# creating rectangle for menu start button
+menuStartRect = pygame.Rect(700, 575, 165, 50)
+# creating rectangle for menu exit button
+menuExitRect = pygame.Rect(410, 575, 165, 50)
+
+# player speed upgrade rectangle
+speedRect = pygame.Rect(550, 300, 45, 50)
+# player health upgrade rectangle
+healthRect = pygame.Rect(550, 435, 45, 50)
+# player attack speed upgrade rectangle
+damageRect = pygame.Rect(845, 300, 45, 50)
+# player _____ rectnagle
+luckRect = pygame.Rect(845, 435, 45, 50)
+
+# ////////////////////////////////////////////////////////// #
+#            INITIALIZING GREY MENU ITEM BARS                #
+# ////////////////////////////////////////////////////////// #
+
+# Black Colour initally, switches to green once item purchased
+barColour = (0, 0, 0)  # Black
+upgradeColour = (0, 255, 0)
+# creating menu speed item bar
+# 27.25 -- Each increment width
+speedBarRect = pygame.Rect(435, 313, 115, 31)
+spdUpgradeRect = pygame.Rect(435, 313, 0, 31)
+spdUpgradeCount = 0
+spdCost = 5
+# creating menu health item bar
+# 23.75  -- Each increment width
+healthBarRect = pygame.Rect(455, 447, 101, 31)
+hlthUpgradeRect = pygame.Rect(455, 447, 0, 31)
+hlthUpgradeCount = 0
+hlthCost = 5
+# creating menu damage item bar
+# 25.25 -- Each increment width
+damageBarRect = pygame.Rect(738, 312, 107, 31)
+dmgUpgradeRect = pygame.Rect(738, 312, 0, 31)
+dmgUpgradeCount = 0
+dmgCost = 5
+# creating menu luck item bar
+# 25.50 -- Each increment width
+luckBarRect = pygame.Rect(738, 445, 108, 31)
+luckUpgradeRect = pygame.Rect(738, 445, 0, 31)
+luckUpgradeCount = 0
+luckCost = 5
+
+shopUpgradeCounts = [spdUpgradeCount, hlthUpgradeCount,
+                     dmgUpgradeCount, luckUpgradeCount]
+shopUpgradeCosts = [spdCost, hlthCost, dmgCost, luckCost]
+shopBarRects = [speedBarRect, healthBarRect, damageBarRect, luckBarRect]
+shopUpgradeRects = [spdUpgradeRect, hlthUpgradeRect,
+                    dmgUpgradeRect, luckUpgradeRect]
+maxUpgradeCount = 4
+
+
+# initializing fonts for the shop
+
 #initialize shop scene
 shopImg = pygame.image.load('Scenes/menu.png')
 shopImg = pygame.transform.scale(shopImg,(750,750))
@@ -71,54 +130,84 @@ startRect = pygame.Rect(415, 225, width, height)
 exitRect = pygame.Rect(415, 425, width, height)
 exitRectFinal = pygame.Rect(882,637,334,91)
 #initializing font
-pygame.font.init()
-font = pygame.font.SysFont("arial", 30)
 
-#/////////////////////////////////////////////////////////////////////////#
+pygame.font.init()
+blackColour = (0, 0, 0)
+font = pygame.font.SysFont("verdana", 45)
+shopFont = pygame.font.SysFont("verdana", 20)
+descriptionFont = pygame.font.SysFont("verdana", 17)
+shopText = font.render("SHOP", False, blackColour)
+# initializing upgrade attribute texts for the shop
+spdMenuText = shopFont.render("SPEED UPGRADE: +1", False, blackColour)
+hlthMenuText = shopFont.render("HEALTH UPGRADE: +5", False, blackColour)
+dmgMenuText = shopFont.render("DAMAGE UPGRADE: +1", False, blackColour)
+luckMenuText = shopFont.render("LUCK UPGRADE: +10%", False, blackColour)
+
+# Description upgrade attribute texts for the shop
+spdDescript = descriptionFont.render(
+    "Increases your movement speed", False, blackColour)
+hlthDescript = descriptionFont.render(
+    "Increases your health", False, blackColour)
+dmgDescript = descriptionFont.render(
+    "Increases the damage you deal", False, blackColour)
+luckDescript = descriptionFont.render(
+    "Increases mob coin drop multiplier", False, blackColour)
+
+
+# /////////////////////////////////////////////////////////////////////////#
 # USE THESE 2 LINES TO INCREMENT coinCount and REDRAW THE COIN TEXT
 # coinCount += 1
 # coinCountText = font.render(str(coinCount), False, (255,255,255))
-#/////////////////////////////////////////////////////////////////////////#
+# /////////////////////////////////////////////////////////////////////////#
+
 
 #//////////////////////////////////////Initialize Methods//////////////////////////////////////#
 #creating player sprite group
 player_group = pygame.sprite.Group()
-player = ""
 #creating mob sprite group
 mob_group = pygame.sprite.Group()
 #creating mob sprite group
 boss_group = pygame.sprite.Group()
 #boolean flags
+
 loadPlaying = True
 shopPlaying = False
 bossPlaying = False
 running = True
+
 win = False
 stage = 0
 #FPS
+
 FPS = 60
-#setting clock
+# setting clock
 clock = pygame.time.Clock()
-#collision
+# collision
 scene = 'beach'
-#initializing counts
+# initializing counts
 coinCount = 0
 healthCount = 50
+
+
 #initializing player sprite
+
 def initializePlayer():
     global player_group
     if player_group:
         player_group.empty()
     num_of_player = 1
+
     for x in range (num_of_player):
         player_group.add(gameSprites.Player("Pirate/1_entity_000_IDLE_000.png", 50, 50, 0, 0))
     global player
     player = player_group.sprites()[0]
 #initializing mob sprite
+
 def initializeMobs():
     global mob_group
     if mob_group:
         mob_group.empty()
+
     num_of_mobs1 = 5
     num_of_mobs2 = 5
     for x in range (num_of_mobs1):
@@ -131,6 +220,24 @@ def initializeBoss():
     num_of_mobs = 1
     for x in range (num_of_mobs):
         boss_group.add(gameSprites.Boss("Boss\walktile000.png", 50, 50, [3,3],50))
+        
+# Reset shop upgrades
+def resetShop():
+    shopUpgradeRects[0].width = 0
+    shopUpgradeRects[1].width = 0
+    shopUpgradeRects[2].width = 0
+    shopUpgradeRects[3].width = 0
+
+    shopUpgradeCosts[0] = 5
+    shopUpgradeCosts[1] = 5
+    shopUpgradeCosts[2] = 5
+    shopUpgradeCosts[3] = 5
+
+    shopUpgradeCounts[0] = 0
+    shopUpgradeCounts[1] = 0
+    shopUpgradeCounts[2] = 0
+    shopUpgradeCounts[3] = 0
+    
 #render images
 def render():
     #adding background image
@@ -138,10 +245,12 @@ def render():
     if not mob_group and not boss_group and not scene == 'treasure':
         screen.blit(arrowImg,arrow_rect)
     #checking if on start screen
+
     if not loadPlaying:
-        #initializing coin text
+        # initializing coin text
         global coinCount
         coinCount = player_group.sprites()[0].coins
+
         coinCountText = font.render(str(coinCount), False, (255, 255, 255))
         #initializing heart text
         global healthCount
@@ -161,15 +270,58 @@ def render():
             mob_group.update(mob_group)
             player_group.update()
         mob_group.draw(screen)
+
+    # //////////////////////////////////////// #
+      if shopPlaying:
+          screen.blit(shopImg, shop_rect)
+
+          pygame.draw.rect(screen, upgradeColour, shopUpgradeRects[0])
+          pygame.draw.rect(screen, upgradeColour, shopUpgradeRects[1])
+          pygame.draw.rect(screen, upgradeColour, shopUpgradeRects[2])
+          pygame.draw.rect(screen, upgradeColour, shopUpgradeRects[3])
+
+          spdCostText = shopFont.render(
+              "COST: " + str(shopUpgradeCosts[0]), False, blackColour)
+          hlthCostText = shopFont.render(
+              "COST: " + str(shopUpgradeCosts[1]), False, blackColour)
+          dmgCostText = shopFont.render(
+              "COST: " + str(shopUpgradeCosts[2]), False, blackColour)
+          luckCostText = shopFont.render(
+              "COST: " + str(shopUpgradeCosts[3]), False, blackColour)
+
+          # Shop title text
+          screen.blit(shopText, (580, 55))
+          # Shop cost texts
+          screen.blit(spdCostText, (400, 270))
+          screen.blit(dmgCostText, (705, 270))
+          screen.blit(hlthCostText, (400, 403))
+          screen.blit(luckCostText, (705, 403))
+
+          # Displays menu text once player hovers over upgrade buttons
+          if 595 
+          
+          
+          pygame.mouse.get_pos()[0] > 550 and 350 > pygame.mouse.get_pos()[1] > 300:
+              screen.blit(spdMenuText, (530, 515))
+              screen.blit(spdDescript, (500, 540))
+          if 595 > pygame.mouse.get_pos()[0] > 550 and 495 > pygame.mouse.get_pos()[1] > 435:
+              screen.blit(hlthMenuText, (525, 515))
+              screen.blit(hlthDescript, (550, 540))
+          if 890 > pygame.mouse.get_pos()[0] > 845 and 350 > pygame.mouse.get_pos()[1] > 300:
+              screen.blit(dmgMenuText, (525, 515))
+              screen.blit(dmgDescript, (510, 540))
+          if 890 > pygame.mouse.get_pos()[0] > 845 and 495 > pygame.mouse.get_pos()[1] > 435:
+              screen.blit(luckMenuText, (530, 515))
+              screen.blit(luckDescript, (490, 540))
+
         if not win:
             player_group.draw(screen)
         #displaying boss
+        
         if bossPlaying:
             boss_group.update(player_group.sprites()[0].rect)
             boss_group.draw(screen)
-        #displaying shop
-        if shopPlaying:
-            screen.blit(shopImg,shop_rect)
+
     #checking if mouse is within game window
     if pygame.mouse.get_focused() == True and loadPlaying or shopPlaying or win:
         #adding mouse image to screen
@@ -179,23 +331,27 @@ def render():
 #musicPlayer
 def musicPlayer(music,vol = 0.7,loop = 0,initialPlay = 0):
     #checking initial play
+
     if initialPlay:
-        #loading music
-        pygame.mixer.music.load(music) 
+        # loading music
+        pygame.mixer.music.load(music)
     else:
-        #changing music
+        # changing music
         pygame.mixer.music.stop()
         pygame.mixer.music.unload()
         pygame.mixer.music.load(music)
-    #setting volume    
+    # setting volume
     pygame.mixer.music.set_volume(vol)
-    #looping music
+    # looping music
     pygame.mixer.music.play(loop)
+
 #building the scenes
+
 def sceneBuilder(newScene):
     global current_img
     global current_rect
     global scene
+
     global bossPlaying
     if(newScene == 'shop'):
         musicPlayer('Music/shopMusic.mp3', 0.1, -1)
@@ -206,21 +362,25 @@ def sceneBuilder(newScene):
     elif(newScene == 'beach'):
         if stage == 0:
             musicPlayer('Music/pirateArr.mp3')
+
         current_img = beachImg
         scene = 'beach'
-    elif(newScene == 'forest'):
+    elif (newScene == 'forest'):
         current_img = forestImg
         scene = 'forest'
+
     elif(newScene == 'cave'):
         current_img = caveImg
         scene = 'cave'
         musicPlayer('Music/bossMusic.mp3', vol=0.3)
     elif(newScene == 'treasure'):
+
         current_img = treasureImg
         scene = 'treasure'
     current_rect = current_img.get_rect()
     initializePlayer()
     initializeMobs()
+
     if newScene == "cave":
         mob_group.empty()
         player_group.sprites()[0].rect.bottom = 170
@@ -233,6 +393,7 @@ def sceneBuilder(newScene):
 #Initalizing main menu
 sceneBuilder("mainMenu")
 #collisionPicker
+
 def collisionPicker(scene):
     if scene == 'beach':
         player_group.sprites()[0].collisionBeach()
@@ -246,6 +407,7 @@ def collisionPicker(scene):
         player_group.sprites()[0].collisionCave()
         for sprites in mob_group.sprites():
             sprites.collisionCave()
+
     if scene == 'treasure':
         None
 extra_distance = 0
@@ -275,16 +437,7 @@ def collisions():
                        mob_group.remove(x)
 
     
-        
-        
-
-
-
-
-
-        
-
-        
+       
 
 
 render()
@@ -306,28 +459,87 @@ while running:
             print(x, y)
             #//////////////////#
 
-            #checking collide point of mouse with start button
+            # checking collide point of mouse with start button
             if startRect.collidepoint(x, y) and loadPlaying:
-                loadPlaying=False
+                loadPlaying = False
                 sceneBuilder('beach')
-    
-            #checking collide point of mouse with exit button
+
+            # checking collide point of mouse with exit button
             if exitRect.collidepoint(x, y) and loadPlaying:
                 running = False
-
+                
             #ending game
             if exitRectFinal.collidepoint(x, y) and win:
                 running = False
 
-        #open shop eventwith escape
+        # open shop event with escape key
         if keys[pygame.K_ESCAPE] and not loadPlaying and not shopPlaying:
             sceneBuilder("shop")
             shopPlaying = True
-        #close shop with escape
-        elif keys[pygame.K_ESCAPE] and not loadPlaying and shopPlaying:
-            shopPlaying = False
-            pygame.mixer.music.stop()
-        
+
+        # shop button start and exit
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            (posX, posY) = pygame.mouse.get_pos()
+
+            # resume / start the game on start menu button press
+            if menuStartRect.collidepoint(posX, posY) and shopPlaying:
+                shopPlaying = False
+                pygame.mixer.music.stop()
+            # exit to main screen on exit menu button press
+            if menuExitRect.collidepoint(posX, posY) and shopPlaying:
+                shopPlaying = False
+                loadPlaying = True
+                sceneBuilder("mainMenu")
+                resetShop()
+
+            if speedRect.collidepoint(posX, posY) and shopPlaying and coinCount >= shopUpgradeCosts[0]:
+                shopUpgradeCounts[0] += 1
+
+                if shopUpgradeCounts[0] <= maxUpgradeCount:
+                    player_group.sprites()[0].coins -= spdCost
+                    shopUpgradeRects[0].width += 28.75
+                    shopUpgradeCosts[0] += 5
+                    # Width needs to be incremented after
+                else:
+                    # Draw txt on screen saying Can't Upgrade anymore !
+                    print("error")
+
+            if healthRect.collidepoint(posX, posY) and shopPlaying and coinCount >= shopUpgradeCosts[1]:
+                shopUpgradeCounts[1] += 1
+
+                if shopUpgradeCounts[1] <= maxUpgradeCount:
+                    player_group.sprites()[0].coins -= hlthCost
+                    shopUpgradeRects[1].width += 25.25
+                    shopUpgradeCosts[1] += 5
+                    # Width needs to be incremented after
+                else:
+                    # Draw txt on screen saying Can't Upgrade anymore !
+                    print("error")
+
+            if damageRect.collidepoint(posX, posY) and shopPlaying and coinCount >= shopUpgradeCosts[2]:
+                shopUpgradeCounts[2] += 1
+
+                if shopUpgradeCounts[2] <= maxUpgradeCount:
+                    player_group.sprites()[0].coins -= dmgCost
+                    shopUpgradeRects[2].width += 26.75
+                    shopUpgradeCosts[2] += 5
+                    # Width needs to be incremented after
+                else:
+                    # Draw txt on screen saying Can't Upgrade anymore !
+                    print("error")
+
+            if luckRect.collidepoint(posX, posY) and shopPlaying and coinCount >= shopUpgradeCosts[3]:
+                shopUpgradeCounts[3] += 1
+
+                if shopUpgradeCounts[3] <= maxUpgradeCount:
+                    player_group.sprites()[0].coins -= luckCost
+                    shopUpgradeRects[3].width += 27
+                    shopUpgradeCosts[3] += 5
+                    # Width needs to be incremented after
+                else:
+                    # Draw txt on screen saying Can't Upgrade anymore !
+                    print("error")
+  
         #spacebar click
         if keys[pygame.K_SPACE] and not loadPlaying and not shopPlaying:
             player_group.sprites()[0].attack()
@@ -359,14 +571,10 @@ while running:
             boss_group.empty()
 
 
-        # CHANGE TO HAVE IT ON MOUSE PRESS INSIDE THE CONTINUE BUTTON / EXIT
-        if keys[pygame.K_9] and shopPlaying:
-            shopPlaying = False
-            loadPlaying = True
-            sceneBuilder("mainMenu")
 
     #player movement
     if not shopPlaying and player_group.sprites()[0].isDeath == False:
+
         if keys[pygame.K_RIGHT]:
             # player_group.sprites()[0].flipPlayer(player_group.sprites()[0].direction)
             player_group.sprites()[0].walk()
@@ -383,19 +591,20 @@ while running:
         if keys[pygame.K_DOWN]:
             player_group.sprites()[0].walk()
             player_group.sprites()[0].rect.y += 5
-    
-    #///////////////////////////#
-    #if conditions are met and player exits screen through right side
-    if keys[pygame.K_f]:
-        sceneBuilder("forest")        
-        
-    #///////////////////////////#
 
     #///////////////////////////#
     #if conditions are met and player exits screen through right side
+    if keys[pygame.K_f]:
+        sceneBuilder("forest")
+
+    # ///////////////////////////#
+
+    # ///////////////////////////#
+    # if conditions are met and player exits screen through right side
     if keys[pygame.K_c]:
         sceneBuilder('cave')
         bossPlaying = True
+
 
     if keys[pygame.K_p]:
         boss_group.sprites()[0].mobspawner(mob_group) 
@@ -407,6 +616,7 @@ while running:
 
     if keys[pygame.K_b]:
         sceneBuilder('beach')
+
 
     #advancing to next stage
     if not mob_group and not boss_group and not scene == 'treasure':
@@ -433,12 +643,12 @@ while running:
     #render
     render()
 
-    #begining level music
+    # begining level music
     if not pygame.mixer.music.get_busy():
         musicPlayer('Music/levelMusic.mp3', 0.01, -1)
 
     
 
 
-#exiting pygame    
+# exiting pygame
 pygame.quit()

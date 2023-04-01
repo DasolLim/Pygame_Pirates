@@ -707,6 +707,24 @@ class Boss(GameObject):
         for idle in self.idleRightSprites:
             self.idleLeftSprites.append(pygame.transform.flip(idle,True,False))
         self.currentIdle = 0
+        self.isIdle = False
+        #for run animation
+        self.runRightSprites = []
+        self.runLeftSprites = []
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile000.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile001.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile002.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile003.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile004.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile005.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile006.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile007.png'))
+        for i in range(len(self.runRightSprites)):
+            self.runRightSprites[i] = pygame.transform.scale(self.runRightSprites[i],(200,200))
+        for run in self.runRightSprites:
+            self.runLeftSprites.append(pygame.transform.flip(run,True,False))
+        self.currentRun = 0
+        self.isRun = False
         #for death animation
         self.deathRightSprites = []
         self.deathLeftSprites = []
@@ -722,29 +740,60 @@ class Boss(GameObject):
         self.isDeath = False
         #////////////////////////////////Animations//////////////////////////////////////////#
 
-    def update(self, player_rect):
+    def update(self, player_rect, boss_group):
         # Find direction vector (dx, dy) between enemy and player.
-        dx, dy = player_rect.x - self.rect.x, player_rect.y - self.rect.y
+        dx, dy = player_rect.centerx - self.rect.centerx, player_rect.centery - self.rect.centery
         dist = math.hypot(dx, dy)
-        if(dist<125):
-            self.dash()
-        else:
+        print(dist)
+        if(dist<125 and not self.isRun and dist > 0):
+            self.isAttacking = False
+            self.isWalking = False
+            self.isIdle = False
+            self.run()
             dx, dy = dx / dist, dy / dist  # Normalize.
             # Move along this normalized vector towards the player at current speed.
             self.rect.x += dx * self.speed[0]
             self.rect.y += dy * self.speed[1]
-                
+            print("IM RUNNING")
+        elif(dist<50 and not self.isAttacking and dist > 0):
+            self.isRun = False
+            self.isIdle = False
+            self.isWalking = False
+            self.attack()
+            dx, dy = dx / dist, dy / dist  # Normalize.
+            # Move along this normalized vector towards the player at current speed.
+            self.rect.x += dx * self.speed[0]
+            self.rect.y += dy * self.speed[1]
+            print("IM ATTACKING")
+        elif(dist>0):
+            self.isAttacking = False
+            self.isRun = False
+            self.isIdle = False
+            self.walk()
+            dx, dy = dx / dist, dy / dist  # Normalize.
+            # Move along this normalized vector towards the player at current speed.
+            self.rect.x += dx * self.speed[0]
+            self.rect.y += dy * self.speed[1]
+    
             if player_rect.centerx < self.rect.centerx:
                 self.direction = 'l'
             else:
                 self.direction = 'r'
+            print("IM WALKING")
+        else:
+            self.isAttacking = False
+            self.isWalking = False
+            self.isRun = False
+            self.idle()
+
 
         #////////////////////////////////Animations//////////////////////////////////////////#
         #walking
-        if self.isWalking == True and self.isAttacking == False and self.isDeath == False:
+        if self.isWalking == True and self.isAttacking == False and self.isDeath == False and self.isRun == False:
             self.currentWalk += 0.2
             if self.currentWalk >= len(self.walkingLeftSprites):
                 self.currentWalk = 0
+                self.isWalking = False
             if(self.direction == 'r'):
                 self.image = self.walkingRightSprites[int(self.currentWalk)]
             else:
@@ -764,6 +813,7 @@ class Boss(GameObject):
             self.currentIdle += 0.3
             if self.currentIdle >= len(self.idleLeftSprites):
                 self.currentIdle = 0
+                self.isIdle = False
             if(self.direction == 'r'):
                 self.image = self.idleRightSprites[int(self.currentIdle)]
             else:
@@ -773,12 +823,26 @@ class Boss(GameObject):
             self.currentDeath += 0.4
             if self.currentDeath >= len(self.deathLeftSprites):
                 self.currentDeath = len(self.deathLeftSprites) - 1
-                # self.isDeath = False
+                self.isDeath = False
+                self.emptySelf(boss_group)
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
             else:
                 self.image = self.deathLeftSprites[int(self.currentDeath)]
+        #run
+        if self.isRun == True:
+            self.currentRun += 0.4
+            if self.currentRun >= len(self.runLeftSprites):
+                self.currentRun = len(self.runLeftSprites) - 1
+                self.isRun = False
+            if(self.direction == 'r'):
+                self.image = self.runRightSprites[int(self.currentRun)]
+            else:
+                self.image = self.runLeftSprites[int(self.currentRun)]
         #////////////////////////////////Animations//////////////////////////////////////////#
+
+    def selfRemove(self, boss_group):
+        boss_group.remove(self)
 
     #////////////////////////////////Animations//////////////////////////////////////////#
     #attacking
@@ -790,10 +854,16 @@ class Boss(GameObject):
     #death
     def death(self):
         self.isDeath = True
+    #run
+    def run(self):
+        self.isRun = True
+
+    def walk(self):
+        self.isWalking = True
     #////////////////////////////////Animations//////////////////////////////////////////#
     
     def dash(self):
-        None
+        self.attack()
     
     def mobspawner(self,mob_group):
         for x in range (4):

@@ -136,9 +136,30 @@ shopUpgradeRects = [spdUpgradeRect, hlthUpgradeRect,
                     dmgUpgradeRect, luckUpgradeRect]
 maxUpgradeCount = 4
 
-# initializing font
+
+# initializing fonts for the shop
 pygame.font.init()
-font = pygame.font.SysFont("arial", 30)
+blackColour = (0, 0, 0)
+font = pygame.font.SysFont("verdana", 45)
+shopFont = pygame.font.SysFont("verdana", 20)
+descriptionFont = pygame.font.SysFont("verdana", 17)
+shopText = font.render("SHOP", False, blackColour)
+# initializing upgrade attribute texts for the shop
+spdMenuText = shopFont.render("SPEED UPGRADE: +1", False, blackColour)
+hlthMenuText = shopFont.render("HEALTH UPGRADE: +5", False, blackColour)
+dmgMenuText = shopFont.render("DAMAGE UPGRADE: +1", False, blackColour)
+luckMenuText = shopFont.render("LUCK UPGRADE: +10%", False, blackColour)
+
+# Description upgrade attribute texts for the shop
+spdDescript = descriptionFont.render(
+    "Increases your movement speed", False, blackColour)
+hlthDescript = descriptionFont.render(
+    "Increases your health", False, blackColour)
+dmgDescript = descriptionFont.render(
+    "Increases the damage you deal", False, blackColour)
+luckDescript = descriptionFont.render(
+    "Increases mob coin drop multiplier", False, blackColour)
+
 
 # /////////////////////////////////////////////////////////////////////////#
 # USE THESE 2 LINES TO INCREMENT coinCount and REDRAW THE COIN TEXT
@@ -199,7 +220,7 @@ def render():
         # initializing coin text
         global coinCount
         coinCount = player_group.sprites()[0].coins
-        coinCountText = font.render(str(coinCount), False, (255, 255, 255))
+        coinCountText = shopFont.render(str(coinCount), False, (255, 255, 255))
 
         # initializing heart text
         global healthCount
@@ -233,6 +254,38 @@ def render():
         pygame.draw.rect(screen, upgradeColour, shopUpgradeRects[1])
         pygame.draw.rect(screen, upgradeColour, shopUpgradeRects[2])
         pygame.draw.rect(screen, upgradeColour, shopUpgradeRects[3])
+
+        spdCostText = shopFont.render(
+            "COST: " + str(shopUpgradeCosts[0]), False, blackColour)
+        hlthCostText = shopFont.render(
+            "COST: " + str(shopUpgradeCosts[1]), False, blackColour)
+        dmgCostText = shopFont.render(
+            "COST: " + str(shopUpgradeCosts[2]), False, blackColour)
+        luckCostText = shopFont.render(
+            "COST: " + str(shopUpgradeCosts[3]), False, blackColour)
+
+        # Shop title text
+        screen.blit(shopText, (580, 55))
+        # Shop cost texts
+        screen.blit(spdCostText, (400, 270))
+        screen.blit(dmgCostText, (705, 270))
+        screen.blit(hlthCostText, (400, 403))
+        screen.blit(luckCostText, (705, 403))
+
+        # Displays menu text once player hovers over upgrade buttons
+        if 595 > pygame.mouse.get_pos()[0] > 550 and 350 > pygame.mouse.get_pos()[1] > 300:
+            screen.blit(spdMenuText, (530, 515))
+            screen.blit(spdDescript, (500, 540))
+        if 595 > pygame.mouse.get_pos()[0] > 550 and 495 > pygame.mouse.get_pos()[1] > 435:
+            screen.blit(hlthMenuText, (525, 515))
+            screen.blit(hlthDescript, (550, 540))
+        if 890 > pygame.mouse.get_pos()[0] > 845 and 350 > pygame.mouse.get_pos()[1] > 300:
+            screen.blit(dmgMenuText, (525, 515))
+            screen.blit(dmgDescript, (510, 540))
+        if 890 > pygame.mouse.get_pos()[0] > 845 and 495 > pygame.mouse.get_pos()[1] > 435:
+            screen.blit(luckMenuText, (530, 515))
+            screen.blit(luckDescript, (490, 540))
+
     # //////////////////////////////////////// #
 
     # checking if mouse is within game window
@@ -383,10 +436,11 @@ while running:
 
             if speedRect.collidepoint(posX, posY) and shopPlaying and coinCount >= shopUpgradeCosts[0]:
                 shopUpgradeCounts[0] += 1
-                player_group.sprites()[0].coins -= spdCost
-                shopUpgradeCosts[0] += 5
+
                 if shopUpgradeCounts[0] <= maxUpgradeCount:
+                    player_group.sprites()[0].coins -= spdCost
                     shopUpgradeRects[0].width += 28.75
+                    shopUpgradeCosts[0] += 5
                     # Width needs to be incremented after
                 else:
                     # Draw txt on screen saying Can't Upgrade anymore !
@@ -394,10 +448,11 @@ while running:
 
             if healthRect.collidepoint(posX, posY) and shopPlaying and coinCount >= shopUpgradeCosts[1]:
                 shopUpgradeCounts[1] += 1
-                player_group.sprites()[0].coins -= spdCost
-                shopUpgradeCosts[1] += 5
+
                 if shopUpgradeCounts[1] <= maxUpgradeCount:
+                    player_group.sprites()[0].coins -= hlthCost
                     shopUpgradeRects[1].width += 25.25
+                    shopUpgradeCosts[1] += 5
                     # Width needs to be incremented after
                 else:
                     # Draw txt on screen saying Can't Upgrade anymore !
@@ -405,11 +460,11 @@ while running:
 
             if damageRect.collidepoint(posX, posY) and shopPlaying and coinCount >= shopUpgradeCosts[2]:
                 shopUpgradeCounts[2] += 1
-                player_group.sprites()[0].coins -= dmgCost
-                shopUpgradeCosts[2] += 5
 
                 if shopUpgradeCounts[2] <= maxUpgradeCount:
+                    player_group.sprites()[0].coins -= dmgCost
                     shopUpgradeRects[2].width += 26.75
+                    shopUpgradeCosts[2] += 5
                     # Width needs to be incremented after
                 else:
                     # Draw txt on screen saying Can't Upgrade anymore !
@@ -417,14 +472,21 @@ while running:
 
             if luckRect.collidepoint(posX, posY) and shopPlaying and coinCount >= shopUpgradeCosts[3]:
                 shopUpgradeCounts[3] += 1
-                player_group.sprites()[0].coins -= luckCost
-                shopUpgradeCosts[3] += 5
+
                 if shopUpgradeCounts[3] <= maxUpgradeCount:
+                    player_group.sprites()[0].coins -= luckCost
                     shopUpgradeRects[3].width += 27
+                    shopUpgradeCosts[3] += 5
                     # Width needs to be incremented after
                 else:
                     # Draw txt on screen saying Can't Upgrade anymore !
                     print("error")
+
+            # speedRect = pygame.Rect(550, 300, 45, 50)
+            # if 550 + 45 > posX > 550 and 300 + 50 > posY > 300:
+            #     print("hi")
+
+            # # pygame.mouse.get_pos()
 
     # player movement
     if not shopPlaying:

@@ -658,6 +658,8 @@ class Boss(GameObject):
         self.speed = speed
         self.direction = 'r'
         self.isDash = False
+        self.framecount = 0
+        self.framecountmobspawn = 0
 
         #////////////////////////////////Animations//////////////////////////////////////////#
         #for walking animation
@@ -679,13 +681,12 @@ class Boss(GameObject):
         #for attacking animation
         self.attackRightSprites = []
         self.attackLeftSprites = []
-        self.attackRightSprites.append(pygame.image.load('Boss/runtile000.png'))
-        self.attackRightSprites.append(pygame.image.load('Boss/runtile001.png'))
-        self.attackRightSprites.append(pygame.image.load('Boss/runtile002.png'))
-        self.attackRightSprites.append(pygame.image.load('Boss/runtile003.png'))
-        self.attackRightSprites.append(pygame.image.load('Boss/runtile004.png'))
-        self.attackRightSprites.append(pygame.image.load('Boss/runtile005.png'))
-        self.attackRightSprites.append(pygame.image.load('Boss/runtile006.png'))
+        self.attackRightSprites.append(pygame.image.load('Boss/attacktile000.png'))
+        self.attackRightSprites.append(pygame.image.load('Boss/attacktile001.png'))
+        self.attackRightSprites.append(pygame.image.load('Boss/attacktile002.png'))
+        self.attackRightSprites.append(pygame.image.load('Boss/attacktile003.png'))
+        self.attackRightSprites.append(pygame.image.load('Boss/attacktile004.png'))
+        self.attackRightSprites.append(pygame.image.load('Boss/attacktile005.png'))
         for i in range(len(self.attackRightSprites)):
             self.attackRightSprites[i] = pygame.transform.scale(self.attackRightSprites[i],(200,200))
         for attack in self.attackRightSprites:
@@ -707,6 +708,24 @@ class Boss(GameObject):
         for idle in self.idleRightSprites:
             self.idleLeftSprites.append(pygame.transform.flip(idle,True,False))
         self.currentIdle = 0
+        self.isIdle = False
+        #for run animation
+        self.runRightSprites = []
+        self.runLeftSprites = []
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile000.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile001.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile002.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile003.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile004.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile005.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile006.png'))
+        self.runRightSprites.append(pygame.image.load('Boss/run2tile007.png'))
+        for i in range(len(self.runRightSprites)):
+            self.runRightSprites[i] = pygame.transform.scale(self.runRightSprites[i],(200,200))
+        for run in self.runRightSprites:
+            self.runLeftSprites.append(pygame.transform.flip(run,True,False))
+        self.currentRun = 0
+        self.isRun = False
         #for death animation
         self.deathRightSprites = []
         self.deathLeftSprites = []
@@ -721,37 +740,73 @@ class Boss(GameObject):
         self.currentDeath = 0
         self.isDeath = False
         #////////////////////////////////Animations//////////////////////////////////////////#
-
-    def update(self, player_rect):
+    
+    def update(self, player_rect, boss_group, mob_group):
         # Find direction vector (dx, dy) between enemy and player.
-        dx, dy = player_rect.x - self.rect.x, player_rect.y - self.rect.y
+        dx, dy = player_rect.centerx - self.rect.centerx, player_rect.centery - self.rect.centery
         dist = math.hypot(dx, dy)
-        if(dist<125):
-            self.dash()
+        if player_rect.centerx < self.rect.right:
+            self.direction = 'l'
         else:
+            self.direction = 'r'
+
+        # if(dist<150):
+        #     self.framecount = self.framecount + 1
+        #     if self.framecount > 100:
+        #         self.idle()
+        #         self.framecount = 0
+
+        #     if self.isIdle == False:
+        #         self.attack()
+        #         if(dist==0):
+        #             dist == 1
+        #         else:
+        #             dx, dy = dx / dist, dy / dist  # Normalize.
+        #             # Move along this normalized vector towards the player at current speed.
+        #             self.rect.x += dx * self.speed[0]
+        #             self.rect.y += dy * self.speed[1]
+        if(dist <= 50 or self.isIdle or self.isAttacking):
+            self.framecountmobspawn = 0
+            self.isWalking = False
+            if self.framecount < 20:
+                self.attack()
+                self.framecount = self.framecount + 1
+            else:
+                self.idle()
+                self.framecount = self.framecount + 1
+                if self.framecount > 115:
+                    self.isIdle = False
+                    self.framecount = 0
+
+
+        elif(dist>50 and not self.isIdle and not self.isAttacking):
+            self.framecount = 0
+            self.framecountmobspawn = self.framecountmobspawn + 1
+            print(self.framecountmobspawn)
+            if self.framecountmobspawn > 500:
+                self.mobspawner(mob_group)
+                self.framecountmobspawn = 0
+            self.walk()
             dx, dy = dx / dist, dy / dist  # Normalize.
             # Move along this normalized vector towards the player at current speed.
             self.rect.x += dx * self.speed[0]
             self.rect.y += dy * self.speed[1]
-                
-            if player_rect.centerx < self.rect.centerx:
-                self.direction = 'l'
-            else:
-                self.direction = 'r'
+
 
         #////////////////////////////////Animations//////////////////////////////////////////#
         #walking
-        if self.isWalking == True and self.isAttacking == False and self.isDeath == False:
+        if self.isWalking == True and self.isAttacking == False and self.isDeath == False and self.isRun == False and self.isIdle == False:
             self.currentWalk += 0.2
             if self.currentWalk >= len(self.walkingLeftSprites):
                 self.currentWalk = 0
+                self.isWalking = False
             if(self.direction == 'r'):
                 self.image = self.walkingRightSprites[int(self.currentWalk)]
             else:
                 self.image = self.walkingLeftSprites[int(self.currentWalk)]
         #attacking
-        if self.isAttacking == True and self.isDeath == False:
-            self.currentAttack += 0.4
+        elif self.isAttacking == True and self.isDeath == False:
+            self.currentAttack += 0.3
             if self.currentAttack >= len(self.attackLeftSprites):
                 self.currentAttack = 0
                 self.isAttacking = False
@@ -760,25 +815,40 @@ class Boss(GameObject):
             else:
                self.image = self.attackLeftSprites[int(self.currentAttack)] 
         #idle
-        if self.isAttacking == False and self.isWalking == False and self.isDeath == False:
+        elif self.isWalking == False and self.isDeath == False:
             self.currentIdle += 0.3
             if self.currentIdle >= len(self.idleLeftSprites):
                 self.currentIdle = 0
+                # self.isIdle = False
             if(self.direction == 'r'):
                 self.image = self.idleRightSprites[int(self.currentIdle)]
             else:
                 self.image = self.idleLeftSprites[int(self.currentIdle)]
         #death
-        if self.isDeath == True:
+        elif self.isDeath == True:
             self.currentDeath += 0.4
             if self.currentDeath >= len(self.deathLeftSprites):
                 self.currentDeath = len(self.deathLeftSprites) - 1
-                # self.isDeath = False
+                self.isDeath = False
+                self.emptySelf(boss_group)
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
             else:
                 self.image = self.deathLeftSprites[int(self.currentDeath)]
+        #run
+        elif self.isRun == True:
+            self.currentRun += 0.4
+            if self.currentRun >= len(self.runLeftSprites):
+                self.currentRun = len(self.runLeftSprites) - 1
+                self.isRun = False
+            if(self.direction == 'r'):
+                self.image = self.runRightSprites[int(self.currentRun)]
+            else:
+                self.image = self.runLeftSprites[int(self.currentRun)]
         #////////////////////////////////Animations//////////////////////////////////////////#
+
+    def selfRemove(self, boss_group):
+        boss_group.remove(self)
 
     #////////////////////////////////Animations//////////////////////////////////////////#
     #attacking
@@ -790,10 +860,16 @@ class Boss(GameObject):
     #death
     def death(self):
         self.isDeath = True
+    #run
+    def run(self):
+        self.isRun = True
+
+    def walk(self):
+        self.isWalking = True
     #////////////////////////////////Animations//////////////////////////////////////////#
     
     def dash(self):
-        None
+        self.attack()
     
     def mobspawner(self,mob_group):
         for x in range (4):

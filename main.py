@@ -307,7 +307,7 @@ def render():
                 screen.blit(luckDescript, (490, 540))
 
         if bossPlaying:
-            boss_group.update(player_group.sprites()[0].rect)
+            boss_group.update(player_group.sprites()[0].rect, boss_group, mob_group)
             boss_group.draw(screen)
 
     # checking if mouse is within game window

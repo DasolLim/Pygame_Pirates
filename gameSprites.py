@@ -226,6 +226,15 @@ class Player(GameObject):
     #     else:
     #         self.image = player_img_with_left_flip
 
+#coin sprite
+class Coin(pygame.sprite.Sprite):
+    def __init__(self,img_path, centerX, centerY):
+        super().__init__()
+
+        self.image = pygame.image.load(img_path)
+        self.rect = self.image.get_rect()
+        self.rect.center = (centerX, centerY)
+
 #mob class
 class Mob1(GameObject):
     def __init__(self,img_path,health,damage,speed):
@@ -343,7 +352,7 @@ class Mob1(GameObject):
         #////////////////////////////////Animations//////////////////////////////////////////#
         super().__init__(img_path,health,damage, rand_x,rand_y)
     #updating
-    def update(self, mob_group, player):
+    def update(self, mob_group, player, coinItem_group):
         if not self.isDeath == True and not self.isHit == True and not self.isAttacking == True:
             self.rect.x = self.rect.x + self.speed[0]
             self.rect.y = self.rect.y + self.speed[1]
@@ -390,6 +399,10 @@ class Mob1(GameObject):
                 self.currentDeath = len(self.deathLeftSprites) - 1
                 self.isDeath = False
                 self.selfRemove(mob_group)
+                #////////////////////CHANGED THIS HERE///////////////////#
+                rand_x = random.randint(100, 1000)
+                rand_y = random.randint(50,528 - 50)
+                coinItem_group.add(Coin("Scenes\coinItemImage.png", rand_x, rand_y))
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
             else:
@@ -560,7 +573,7 @@ class Mob2(GameObject):
         #////////////////////////////////Animations//////////////////////////////////////////#
         super().__init__(img_path,health,damage, rand_x,rand_y)
     #updating
-    def update(self,mob_group, player):
+    def update(self,mob_group, player, coinItem_group):
         if not self.isDeath == True and not self.isHit == True and not self.isAttacking == True:
             self.rect.x = self.rect.x + self.speed[0]
             self.rect.y = self.rect.y + self.speed[1]
@@ -607,6 +620,10 @@ class Mob2(GameObject):
                 self.currentDeath = len(self.deathLeftSprites) - 1
                 self.isDeath = False
                 self.selfRemove(mob_group)
+                #/////////////COIN DROP FOR GOBLINS//////////////#
+                rand_x = random.randint(100, 1000)
+                rand_y = random.randint(50,528 - 50)
+                coinItem_group.add(Coin("Scenes\coinItemImage.png", rand_x, rand_y))
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
             else:

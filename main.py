@@ -535,10 +535,9 @@ while running:
                 resetShop()
 
             if speedRect.collidepoint(posX, posY) and shopPlaying:
-                shopUpgradeCounts[0] += 1
-
                 if shopUpgradeCounts[0] <= maxUpgradeCount and coinCount >= shopUpgradeCosts[0]:
-                    player_group.sprites()[0].coins -= spdCost
+                    shopUpgradeCounts[0] += 1
+                    player_group.sprites()[0].coins -= shopUpgradeCosts[0]
                     shopUpgradeRects[0].width += 28.75
                     shopUpgradeCosts[0] += 5
                     # Width needs to be incremented after
@@ -547,10 +546,9 @@ while running:
                     print("error")
 
             if healthRect.collidepoint(posX, posY) and shopPlaying:
-                shopUpgradeCounts[1] += 1
-
                 if shopUpgradeCounts[1] <= maxUpgradeCount and coinCount >= shopUpgradeCosts[1]:
-                    player_group.sprites()[0].coins -= hlthCost
+                    shopUpgradeCounts[1] += 1
+                    player_group.sprites()[0].coins -= shopUpgradeCosts[1]
                     shopUpgradeRects[1].width += 25.25
                     shopUpgradeCosts[1] += 5
                     # Width needs to be incremented after
@@ -559,10 +557,9 @@ while running:
                     print("error")
 
             if damageRect.collidepoint(posX, posY) and shopPlaying:
-                shopUpgradeCounts[2] += 1
-
                 if shopUpgradeCounts[2] <= maxUpgradeCount and coinCount >= shopUpgradeCosts[2]:
-                    player_group.sprites()[0].coins -= dmgCost
+                    shopUpgradeCounts[2] += 1
+                    player_group.sprites()[0].coins -= shopUpgradeCosts[2]
                     shopUpgradeRects[2].width += 26.75
                     shopUpgradeCosts[2] += 5
                     # Width needs to be incremented after
@@ -571,10 +568,9 @@ while running:
                     print("error")
 
             if luckRect.collidepoint(posX, posY) and shopPlaying:
-                shopUpgradeCounts[3] += 1
-
                 if shopUpgradeCounts[3] <= maxUpgradeCount and coinCount >= shopUpgradeCosts[3]:
-                    player_group.sprites()[0].coins -= luckCost
+                    shopUpgradeCounts[3] += 1
+                    player_group.sprites()[0].coins -= shopUpgradeCosts[3]
                     shopUpgradeRects[3].width += 27
                     shopUpgradeCosts[3] += 5
                     # Width needs to be incremented after

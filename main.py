@@ -115,7 +115,7 @@ treasureImg = pygame.transform.scale(treasureImg, (1280, 780))
 treasure_rect = treasureImg.get_rect()
 # initializing coin image
 coinImg = pygame.image.load('Scenes/coin_100x94.png')
-coinImg = pygame.transform.scale(coinImg, (65, 65))
+coinImg = pygame.transform.scale(coinImg, (60, 60))
 coin_rect = coinImg.get_rect()
 # initializing heart image
 heartImg = pygame.image.load('Scenes/Heart.png')
@@ -153,7 +153,6 @@ dmgDescript = descriptionFont.render(
 luckDescript = descriptionFont.render(
     "Increases mob coin drop multiplier", False, blackColour)
 
-
 # /////////////////////////////////////////////////////////////////////////#
 # USE THESE 2 LINES TO INCREMENT coinCount and REDRAW THE COIN TEXT
 # coinCount += 1
@@ -168,6 +167,9 @@ player_group = pygame.sprite.Group()
 mob_group = pygame.sprite.Group()
 # creating mob sprite group
 boss_group = pygame.sprite.Group()
+# creating coin item sprite group ***********
+coinItem_group = pygame.sprite.Group()
+
 # boolean flags
 
 loadPlaying = True
@@ -199,9 +201,20 @@ def initializePlayer():
 
     for x in range(num_of_player):
         player_group.add(gameSprites.Player(
-            "Pirate/1_entity_000_IDLE_000.png", 50, 10, 0, 100))
+            "Pirate/1_entity_000_IDLE_000.png", 50, 10, 0, 0))
     global player
     player = player_group.sprites()[0]
+
+# initializing coin ITEM sprite *********
+def initializeCoinItem(pos_x, pos_y):
+    global coinItem_group
+    if coinItem_group:
+        coinItem_group.empty()
+    num_of_coins = 1
+
+    for i in range(num_of_coins):
+        coinItem_group.add(gameSprites.Coin("Scenes\coinItemImage.png", pos_x, pos_y))
+
 # initializing mob sprite
 
 
@@ -253,18 +266,20 @@ def render():
             # displaying coin/health background
             screen.blit(textBackground_image, (1125, 570))
             # displaying coin info
-            screen.blit(coinCountText, (1230, 730))
+            screen.blit(coinCountText, (1220, 735))
             screen.blit(coinImg, (1160, 720))
             # displaying heart info
-            screen.blit(healthCountText, (1230, 680))
+            screen.blit(healthCountText, (1220, 685))
             screen.blit(heartImg, (1160, 665))
             # CHANGED ?????????
             player_group.draw(screen)
         # displaying player & mobs
         if not shopPlaying:
-            mob_group.update(mob_group, player_group.sprites()[0])
+            mob_group.update(mob_group, player_group.sprites()[0], coinItem_group)
             player_group.update()
         mob_group.draw(screen)
+
+        coinItem_group.draw(screen) #***************TEST***************#
 
     # //////////////////////////////////////// #
         if shopPlaying:
@@ -306,7 +321,7 @@ def render():
                 screen.blit(luckMenuText, (530, 515))
                 screen.blit(luckDescript, (490, 540))
 
-        if bossPlaying:
+        if bossPlaying and not shopPlaying:
             boss_group.update(player_group.sprites()[
                               0].rect, boss_group, mob_group, player_group.sprites()[0])
             boss_group.draw(screen)
@@ -373,6 +388,8 @@ def sceneBuilder(newScene):
     initializePlayer()
     initializeMobs()
     initializeBoss()
+    # #////////TESTING///////////#
+    # initializeCoinItem(400, 400)
 
     if newScene == "cave":
         mob_group.empty()
@@ -411,6 +428,12 @@ extra_distance = 0
 
 # player/mob collisions
 def collisions():
+    #//////////////COIN COLLISION/////////////////#
+    myDict = pygame.sprite.groupcollide(
+        player_group, coinItem_group, False, True)
+    if myDict:
+        player_group.sprites()[0].coins += 10
+
     myDict = pygame.sprite.groupcollide(
         player_group, mob_group, False, False)
     if myDict:
@@ -588,6 +611,7 @@ while running:
         if keys[pygame.K_4]:
             mob_group.empty()
             boss_group.empty()
+            coinItem_group.empty() # Clears all items including the coins on the screen
 
     # player movement
     if not shopPlaying and player_group.sprites()[0].isDeath == False:

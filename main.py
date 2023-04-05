@@ -148,8 +148,8 @@ shopFont = pygame.font.SysFont("verdana", 20)
 descriptionFont = pygame.font.SysFont("verdana", 17)
 shopText = font.render("SHOP", False, blackColour)
 # initializing upgrade attribute texts for the shop
-spdMenuText = shopFont.render("SPEED UPGRADE: +1", False, blackColour)
-hlthMenuText = shopFont.render("HEALTH UPGRADE: +5", False, blackColour)
+spdMenuText = shopFont.render("SPEED UPGRADE: +0.5", False, blackColour)
+hlthMenuText = shopFont.render("HEALTH UPGRADE: +1", False, blackColour)
 dmgMenuText = shopFont.render("DAMAGE UPGRADE: +1", False, blackColour)
 luckMenuText = shopFont.render("LUCK UPGRADE: +10%", False, blackColour)
 
@@ -198,7 +198,11 @@ clock = pygame.time.Clock()
 scene = 'beach'
 # initializing counts
 coinCount = 0
-healthCount = 50
+speedCount = [5,5]
+damageCount = 1
+luckCount = 0
+healthCount = 3
+
 
 
 # initializing player sprite
@@ -211,7 +215,7 @@ def initializePlayer():
 
     for x in range(num_of_player):
         player_group.add(gameSprites.Player(
-            "Pirate/1_entity_000_IDLE_000.png", 50, 10, 0, 0))
+            "Pirate/1_entity_000_IDLE_000.png", healthCount, damageCount, speedCount, 50, luckCount))
     global player
     player = player_group.sprites()[0]
 
@@ -237,11 +241,11 @@ def initializeMobs():
     num_of_mobs2 = 5
     for x in range(num_of_mobs1):
         mob_group.add(gameSprites.Mob1(
-            "Skeleton\walktile000.png", 50, 10, [2, 2]))
+            "Skeleton\walktile000.png", 3, 1, [2, 2]))
     if scene == 'forest':
         for x in range(num_of_mobs2):
             mob_group.add(gameSprites.Mob2(
-                "Goblin/runtile000.png", 50, 10, [2.5, 2.5]))
+                "Goblin/runtile000.png", 2, 1, [2.5, 2.5]))
 
 
 def initializeBoss():
@@ -252,7 +256,7 @@ def initializeBoss():
     num_of_mobs = 1
     for x in range(num_of_mobs):
         boss_group.add(gameSprites.Boss(
-            "Boss\walktile000.png", 50, 10, [3, 3], 50))
+            "Boss\walktile000.png", 15, 2, [3, 3], 50))
 
 # render images
 
@@ -270,8 +274,6 @@ def render():
         coinCount = player_group.sprites()[0].coins
 
         coinCountText = shopFont.render(str(coinCount), False, (255, 255, 255))
-        # initializing heart text
-        global healthCount
         healthCount = player_group.sprites()[0].health
         healthCountText = shopFont.render(
             str(healthCount), False, (255, 255, 255))
@@ -349,6 +351,7 @@ def render():
             
             elif(player_group.sprites()[0].whoKilled=="boss"):
                 selectedDeathImg = bossDeathImg
+
             player_group.draw(screen)
 
             screen.blit(selectedDeathImg,deathImgRect)
@@ -406,6 +409,7 @@ def sceneBuilder(newScene):
     elif (newScene == 'cave'):
         current_img = caveImg
         scene = 'cave'
+        initializeBoss()
         musicPlayer('Music/bossMusic.mp3', vol=0.3)
     elif (newScene == 'treasure'):
 
@@ -414,7 +418,8 @@ def sceneBuilder(newScene):
     current_rect = current_img.get_rect()
     initializePlayer()
     initializeMobs()
-    initializeBoss()
+    coinItem_group.empty()
+    
     # #////////TESTING///////////#
     # initializeCoinItem(400, 400)
 
@@ -459,7 +464,7 @@ def collisions():
     myDict = pygame.sprite.groupcollide(
         player_group, coinItem_group, False, True)
     if myDict:
-        player_group.sprites()[0].coins += 10
+        player_group.sprites()[0].coins += 1
 
     myDict = pygame.sprite.groupcollide(
         player_group, mob_group, False, False)
@@ -548,6 +553,7 @@ while running:
             # checking collide point of mouse with start button
             if startRect.collidepoint(posX, posY) and loadPlaying:
                 loadPlaying = False
+                healthCount = 3
                 sceneBuilder('beach')
 
             # checking collide point of mouse with exit button
@@ -587,6 +593,8 @@ while running:
                     player_group.sprites()[0].coins -= shopUpgradeCosts[0]
                     shopUpgradeRects[0].width += 28.75
                     shopUpgradeCosts[0] += 5
+                    speedCount = [speedCount[0] + 0.5, speedCount[1] + 0.5]
+                    player_group.sprites()[0].speed = speedCount
                     # Width needs to be incremented after
                 else:
                     # Draw txt on screen saying Can't Upgrade anymore !
@@ -598,6 +606,7 @@ while running:
                     player_group.sprites()[0].coins -= shopUpgradeCosts[1]
                     shopUpgradeRects[1].width += 25.25
                     shopUpgradeCosts[1] += 5
+                    player.maxHealth += 1
                     # Width needs to be incremented after
                 else:
                     # Draw txt on screen saying Can't Upgrade anymore !
@@ -609,6 +618,8 @@ while running:
                     player_group.sprites()[0].coins -= shopUpgradeCosts[2]
                     shopUpgradeRects[2].width += 26.75
                     shopUpgradeCosts[2] += 5
+                    damageCount += 1
+                    player_group.sprites()[0].damage = damageCount
                     # Width needs to be incremented after
                 else:
                     # Draw txt on screen saying Can't Upgrade anymore !
@@ -620,6 +631,8 @@ while running:
                     player_group.sprites()[0].coins -= shopUpgradeCosts[3]
                     shopUpgradeRects[3].width += 27
                     shopUpgradeCosts[3] += 5
+                    luckCount += 0.1
+                    player_group.sprites()[0].luck = luckCount
                     # Width needs to be incremented after
                 else:
                     # Draw txt on screen saying Can't Upgrade anymore !
@@ -662,19 +675,23 @@ while running:
         if keys[pygame.K_RIGHT]:
             # player_group.sprites()[0].flipPlayer(player_group.sprites()[0].direction)
             player_group.sprites()[0].walk()
-            player_group.sprites()[0].rect.x += 5
+            player_group.sprites()[0].rect.x += speedCount[0]
+            player_group.sprites()[0].speed = speedCount
             player_group.sprites()[0].direction = 'r'
         if keys[pygame.K_LEFT]:
             # player_group.sprites()[0].flipPlayer(player_group.sprites()[0].direction)
             player_group.sprites()[0].walk()
-            player_group.sprites()[0].rect.x -= 5
+            player_group.sprites()[0].rect.x -= speedCount[0]
+            player_group.sprites()[0].speed = speedCount
             player_group.sprites()[0].direction = 'l'
         if keys[pygame.K_UP]:
             player_group.sprites()[0].walk()
-            player_group.sprites()[0].rect.y -= 5
+            player_group.sprites()[0].rect.y -= speedCount[0]
+            player_group.sprites()[0].speed = speedCount
         if keys[pygame.K_DOWN]:
             player_group.sprites()[0].walk()
-            player_group.sprites()[0].rect.y += 5
+            player_group.sprites()[0].rect.y += speedCount[0]
+            player_group.sprites()[0].speed = speedCount
 
     # ///////////////////////////#
     # if conditions are met and player exits screen through right side
@@ -703,6 +720,7 @@ while running:
     # advancing to next stage
     if not mob_group and not boss_group and not scene == 'treasure':
         if player_group.sprites()[0].rect.right >= screen_rect.right:
+            healthCount = player_group.sprites()[0].maxHealth
             if stage < 1:
                 stage += 1
                 sceneBuilder('beach')
@@ -715,6 +733,7 @@ while running:
             else:
                 sceneBuilder('treasure')
                 win = True
+            
 
     # player boundaries
     collisionPicker(scene)

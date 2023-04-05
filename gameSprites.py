@@ -1,4 +1,4 @@
-import pygame,random, math
+import pygame,random, math, random
 
 bg_img = pygame.image.load('Scenes/backgroundimage.png')
 bg_img = pygame.transform.scale(bg_img, (1280, 780))
@@ -15,7 +15,7 @@ cavRectLeft = pygame.Rect(960, 541, 10,500)
 
 #parent sprite
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self,img_path,health,damage,centerX,centerY):
+    def __init__(self,img_path,health,damage,centerX,centerY,speed):
         super().__init__()
         self.image = pygame.image.load(img_path)
         self.tempImage = self.image
@@ -23,13 +23,16 @@ class GameObject(pygame.sprite.Sprite):
         self.rect.center = (centerX,centerY)
         self.health = health
         self.damage = damage
+        self.speed = speed
         self.whoKilled = ''
+        
 #player sprite
 class Player(GameObject):
-    def __init__(self,img_path,health,damage,kill_counter,coins):
-        self.kill_counter = kill_counter
+    def __init__(self,img_path,health,damage,speed,coins,luck):
         self.coins = coins
         self.direction = 'r'
+        self.luck = luck
+        self.maxHealth = health
 
         #////////////////////////////////Animations//////////////////////////////////////////#
         #for attacking animation
@@ -103,7 +106,7 @@ class Player(GameObject):
         self.isDeath = False
         #////////////////////////////////Animations//////////////////////////////////////////#
 
-        super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery)
+        super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery,speed)
 
     #updating
     def update(self):
@@ -239,8 +242,6 @@ class Coin(pygame.sprite.Sprite):
 #mob class
 class Mob1(GameObject):
     def __init__(self,img_path,health,damage,speed):
-        
-        self.speed = speed
         random_side = random.choice([-1,1])
         self.direction = 'r'
         self.type = "skeleton"
@@ -253,11 +254,16 @@ class Mob1(GameObject):
         else: # Right
             rand_x = bg_rect.right-50
             self.direction = 'l'
-            for i in range(len(self.speed)):
-                self.speed[i] = -self.speed[i]
 
         # Spawn mob at random y value
         rand_y = random.randint(50,528 - 50)
+
+        super().__init__(img_path,health,damage, rand_x,rand_y,speed)
+        if self.direction == "l":
+            for i in range(len(self.speed)):
+                self.speed[i] = -self.speed[i]
+
+
 
         #////////////////////////////////Animations//////////////////////////////////////////#
         #for walking animation
@@ -351,7 +357,8 @@ class Mob1(GameObject):
         self.currentDeath = 0
         self.isDeath = False
         #////////////////////////////////Animations//////////////////////////////////////////#
-        super().__init__(img_path,health,damage, rand_x,rand_y)
+        
+        
     #updating
     def update(self, mob_group, player, coinItem_group):
         if not self.isDeath == True and not self.isHit == True and not self.isAttacking == True:
@@ -493,7 +500,6 @@ class Mob1(GameObject):
 
 class Mob2(GameObject):
     def __init__(self,img_path,health,damage,speed):
-        self.speed = speed
         random_side = random.choice([-1,1])
         self.direction = 'r'
         self.type = "goblin"
@@ -506,11 +512,13 @@ class Mob2(GameObject):
         else: # Right
             rand_x = bg_rect.right-50
             self.direction = 'l'
-            for i in range(len(self.speed)):
-                self.speed[i] = -self.speed[i]
-
         # Spawn mob at random y value
         rand_y = random.randint(50,528 - 50)
+        super().__init__(img_path,health,damage, rand_x,rand_y,speed)
+
+        if self.direction == "l":
+            for i in range(len(self.speed)):
+                self.speed[i] = -self.speed[i]
 
         #////////////////////////////////Animations//////////////////////////////////////////#
         #for walking animation
@@ -574,7 +582,7 @@ class Mob2(GameObject):
         self.currentDeath = 0
         self.isDeath = False
         #////////////////////////////////Animations//////////////////////////////////////////#
-        super().__init__(img_path,health,damage, rand_x,rand_y)
+        
     #updating
     def update(self,mob_group, player, coinItem_group):
         if not self.isDeath == True and not self.isHit == True and not self.isAttacking == True:
@@ -629,6 +637,16 @@ class Mob2(GameObject):
                 rand_x = random.randint(100, 1000)
                 rand_y = random.randint(50,528 - 50)
                 coinItem_group.add(Coin("Scenes\coinItemImage.png", rand_x, rand_y))
+                randExtra = player.luck * 100
+                randNum = random.randint(1,100)
+                print(f"luck {player.luck} randextra {randExtra} randnum {randExtra}")
+                if randExtra >= randNum:
+                    print("TWO COINS")
+                    rand_x = random.randint(100, 1000)
+                    rand_y = random.randint(50,528 - 50)
+                    coinItem_group.add(Coin("Scenes\coinItemImage.png", rand_x, rand_y))
+
+
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
             else:
@@ -690,10 +708,8 @@ class Mob2(GameObject):
     #///////////////////////////////Collisions//////////////////////////////////////////#
 
 class Boss(GameObject):
-    def __init__(self,img_path,health,damage,speed,shield):
-        super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery)
-        self.shield = shield
-        self.speed = speed
+    def __init__(self,img_path,health,damage,speed):
+        super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery,speed)
         self.direction = 'r'
         self.isDash = False
         self.framecount = 0

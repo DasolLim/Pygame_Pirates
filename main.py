@@ -60,6 +60,8 @@ healthRect = pygame.Rect(550, 435, 45, 50)
 damageRect = pygame.Rect(845, 300, 45, 50)
 # player _____ rectnagle
 luckRect = pygame.Rect(845, 435, 45, 50)
+#deathButton
+deathButton = pygame.Rect(486,440,147,69)
 
 # ////////////////////////////////////////////////////////// #
 #            INITIALIZING GREY MENU ITEM BARS                #
@@ -103,6 +105,14 @@ maxUpgradeCount = 4
 
 
 # initializing fonts for the shop
+
+# initialize death scenes
+skeletonDeathImg = pygame.image.load('Death/skeletonDeath.png')
+goblinDeathImg = pygame.image.load('Death/goblinDeath.png')
+bossDeathImg = pygame.image.load('Death/bossDeath.png')
+deathImgRect = skeletonDeathImg.get_rect()
+deathImgRect.center = screen_rect.center
+selectedDeathImg = None
 
 # initialize shop scene
 shopImg = pygame.image.load('Scenes/menu.png')
@@ -171,7 +181,7 @@ boss_group = pygame.sprite.Group()
 coinItem_group = pygame.sprite.Group()
 
 # boolean flags
-
+deathPlaying = False
 loadPlaying = True
 shopPlaying = False
 bossPlaying = False
@@ -236,6 +246,9 @@ def initializeMobs():
 
 def initializeBoss():
     global boss_group
+    if boss_group:
+        boss_group.empty()
+
     num_of_mobs = 1
     for x in range(num_of_mobs):
         boss_group.add(gameSprites.Boss(
@@ -249,8 +262,8 @@ def render():
     screen.blit(current_img, current_rect)
     if not mob_group and not boss_group and not scene == 'treasure':
         screen.blit(arrowImg, arrow_rect)
+    
     # checking if on start screen
-
     if not loadPlaying:
         # initializing coin text
         global coinCount
@@ -262,7 +275,7 @@ def render():
         healthCount = player_group.sprites()[0].health
         healthCountText = shopFont.render(
             str(healthCount), False, (255, 255, 255))
-        if not win:
+        if not win and not deathPlaying:
             # displaying coin/health background
             screen.blit(textBackground_image, (1125, 570))
             # displaying coin info
@@ -282,7 +295,7 @@ def render():
         coinItem_group.draw(screen) #***************TEST***************#
 
     # //////////////////////////////////////// #
-        if shopPlaying:
+        if shopPlaying and not deathPlaying:
             screen.blit(shopImg, shop_rect)
 
             pygame.draw.rect(screen, upgradeColour, shopUpgradeRects[0])
@@ -325,9 +338,23 @@ def render():
             boss_group.update(player_group.sprites()[
                               0].rect, boss_group, mob_group, player_group.sprites()[0])
             boss_group.draw(screen)
+            
+        if deathPlaying:
+            global selectedDeathImg
+            if(player_group.sprites()[0].whoKilled=="skeleton"):
+                selectedDeathImg = skeletonDeathImg
+            
+            elif(player_group.sprites()[0].whoKilled=="goblin"):
+                selectedDeathImg = goblinDeathImg
+            
+            elif(player_group.sprites()[0].whoKilled=="boss"):
+                selectedDeathImg = bossDeathImg
+            player_group.draw(screen)
+
+            screen.blit(selectedDeathImg,deathImgRect)
 
     # checking if mouse is within game window
-    if pygame.mouse.get_focused() == True and loadPlaying or shopPlaying or win:
+    if pygame.mouse.get_focused() == True and loadPlaying or shopPlaying or win or deathPlaying:
         # adding mouse image to screen
         screen.blit(cursor_img, pygame.mouse.get_pos())
     # refreshing screen
@@ -469,6 +496,11 @@ def collisions():
     if boss_group and pygame.sprite.collide_rect(player,boss_group.sprites()[0]) and boss_group.sprites()[0].framecount == 20:
         player.health -= boss_group.sprites()[0].damage
         player.hit()
+        if player.health >= 0:
+            player.whoKilled = boss_group.sprites()[0].type
+    if(player.health<0):
+        global deathPlaying
+        deathPlaying = True
 
 # Reset shop upgrades
 def resetShop():
@@ -509,6 +541,10 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             (posX, posY) = pygame.mouse.get_pos()
 
+            # print("x:" + str(posX) + '- y:' + str(posY))
+
+
+
             # checking collide point of mouse with start button
             if startRect.collidepoint(posX, posY) and loadPlaying:
                 loadPlaying = False
@@ -517,6 +553,15 @@ while running:
             # checking collide point of mouse with exit button
             if exitRect.collidepoint(posX, posY) and loadPlaying:
                 running = False
+
+            #death screen button
+            if deathButton.collidepoint(posX, posY) and deathPlaying:
+                deathPlaying = False
+                sceneBuilder("mainMenu")
+                resetShop()
+                stage = 0
+                loadPlaying = True
+                bossPlaying = False
 
             # ending game
             if exitRectFinal.collidepoint(posX, posY) and win:
@@ -531,8 +576,10 @@ while running:
             if menuExitRect.collidepoint(posX, posY) and shopPlaying:
                 shopPlaying = False
                 loadPlaying = True
-                sceneBuilder("mainMenu")
                 resetShop()
+                stage = 0
+                sceneBuilder("mainMenu")
+                bossPlaying = False
 
             if speedRect.collidepoint(posX, posY) and shopPlaying:
                 if shopUpgradeCounts[0] <= maxUpgradeCount and coinCount >= shopUpgradeCosts[0]:

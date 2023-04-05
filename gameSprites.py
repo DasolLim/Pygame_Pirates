@@ -23,6 +23,7 @@ class GameObject(pygame.sprite.Sprite):
         self.rect.center = (centerX,centerY)
         self.health = health
         self.damage = damage
+        self.whoKilled = ''
 #player sprite
 class Player(GameObject):
     def __init__(self,img_path,health,damage,kill_counter,coins):
@@ -374,6 +375,8 @@ class Mob1(GameObject):
                 self.currentAttack = 0
                 self.isAttacking = False
                 player.health -= self.damage
+                if player.health > 0:
+                    player.whoKilled = self.type
                 player.hit()
             if(self.direction == 'r'):
                 self.image = self.attackRightSprites[int(self.currentAttack)]
@@ -595,6 +598,8 @@ class Mob2(GameObject):
                 self.currentAttack = 0
                 self.isAttacking = False
                 player.health -= self.damage
+                if player.health > 0:
+                    player.whoKilled = self.type
                 player.hit()
             if(self.direction == 'r'):
                 self.image = self.attackRightSprites[int(self.currentAttack)]
@@ -694,6 +699,7 @@ class Boss(GameObject):
         self.framecount = 0
         self.framecountmobspawn = 0
         self.playerDamage = 0
+        self.type = "boss"
 
         
 

@@ -1,8 +1,12 @@
+# imports
 import pygame,random, math, random
 
+# initializing images
 bg_img = pygame.image.load('Scenes/backgroundimage.png')
 bg_img = pygame.transform.scale(bg_img, (1280, 780))
 bg_rect = bg_img.get_rect()
+
+# creating rectangles
 waterRect = pygame.Rect(0, 523, 1280, 500)
 treeRect = pygame.Rect(912,577,500,500)
 treeRectTop = pygame.Rect(836,525,500,500)
@@ -13,7 +17,7 @@ caveRect = pygame.Rect(1022,590,500,500)
 caveRectTop = pygame.Rect(961,540,500,500)
 cavRectLeft = pygame.Rect(960, 541, 10,500)
 
-#parent sprite
+# parent sprite object
 class GameObject(pygame.sprite.Sprite):
     def __init__(self,img_path,health,damage,centerX,centerY,speed):
         super().__init__()
@@ -25,17 +29,17 @@ class GameObject(pygame.sprite.Sprite):
         self.damage = damage
         self.speed = speed
         self.whoKilled = ''
-        
-#player sprite
+
+# player sprite object
 class Player(GameObject):
     def __init__(self,img_path,health,damage,speed,coins,luck):
         self.coins = coins
         self.direction = 'r'
         self.luck = luck
         self.maxHealth = health
-
+        
         #////////////////////////////////Animations//////////////////////////////////////////#
-        #for attacking animation
+        # for attacking animation
         self.attackRightSprites = []
         self.attackLeftSprites = []
         self.attackRightSprites.append(pygame.image.load('Pirate/1_entity_000_ATTACK_000.png'))
@@ -45,11 +49,13 @@ class Player(GameObject):
         self.attackRightSprites.append(pygame.image.load('Pirate/1_entity_000_ATTACK_004.png'))
         self.attackRightSprites.append(pygame.image.load('Pirate/1_entity_000_ATTACK_005.png'))
         self.attackRightSprites.append(pygame.image.load('Pirate/1_entity_000_ATTACK_006.png'))
+        
         for attack in self.attackRightSprites:
             self.attackLeftSprites.append(pygame.transform.flip(attack,True,False))
         self.currentAttack = 0
         self.isAttacking = False
-        #for walking animation
+
+        # for walking animation
         self.walkingRightSprites = []
         self.walkingLeftSprites = []
         self.walkingRightSprites.append(pygame.image.load('Pirate/1_entity_000_WALK_000.png'))
@@ -59,11 +65,13 @@ class Player(GameObject):
         self.walkingRightSprites.append(pygame.image.load('Pirate/1_entity_000_WALK_004.png'))
         self.walkingRightSprites.append(pygame.image.load('Pirate/1_entity_000_WALK_005.png'))
         self.walkingRightSprites.append(pygame.image.load('Pirate/1_entity_000_WALK_006.png'))
+
         for walk in self.walkingRightSprites:
             self.walkingLeftSprites.append(pygame.transform.flip(walk,True,False))
         self.currentWalk = 0
         self.isWalking = False
-        #for idle animation
+
+        # for idle animation
         self.idleRightSprites = []
         self.idleLeftSprites = []
         self.idleRightSprites.append(pygame.image.load('Pirate/1_entity_000_IDLE_000.png'))
@@ -73,10 +81,12 @@ class Player(GameObject):
         self.idleRightSprites.append(pygame.image.load('Pirate/1_entity_000_IDLE_004.png'))
         self.idleRightSprites.append(pygame.image.load('Pirate/1_entity_000_IDLE_005.png'))
         self.idleRightSprites.append(pygame.image.load('Pirate/1_entity_000_IDLE_006.png'))
+
         for idle in self.idleRightSprites:
             self.idleLeftSprites.append(pygame.transform.flip(idle,True,False))
         self.currentIdle = 0
-        #for hit animation
+
+        # for hit animation
         self.hitRightSprites = []
         self.hitLeftSprites = []
         self.hitRightSprites.append(pygame.image.load('Pirate/1_entity_000_HURT_000.png'))
@@ -86,11 +96,13 @@ class Player(GameObject):
         self.hitRightSprites.append(pygame.image.load('Pirate/1_entity_000_HURT_004.png'))
         self.hitRightSprites.append(pygame.image.load('Pirate/1_entity_000_HURT_005.png'))
         self.hitRightSprites.append(pygame.image.load('Pirate/1_entity_000_HURT_006.png'))
+        
         for hit in self.hitRightSprites:
             self.hitLeftSprites.append(pygame.transform.flip(hit,True,False))
         self.currentHit = 0
         self.isHit = False
-        #for death animation
+        
+        # for death animation
         self.deathRightSprites = []
         self.deathLeftSprites = []
         self.deathRightSprites.append(pygame.image.load('Pirate/1_entity_000_DIE_000.png'))
@@ -100,21 +112,25 @@ class Player(GameObject):
         self.deathRightSprites.append(pygame.image.load('Pirate/1_entity_000_DIE_004.png'))
         self.deathRightSprites.append(pygame.image.load('Pirate/1_entity_000_DIE_005.png'))
         self.deathRightSprites.append(pygame.image.load('Pirate/1_entity_000_DIE_006.png'))
+
         for death in self.deathRightSprites:
             self.deathLeftSprites.append(pygame.transform.flip(death,True,False))
+            
         self.currentDeath = 0
         self.isDeath = False
         #////////////////////////////////Animations//////////////////////////////////////////#
-
+        
+        # super constructor call
         super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery,speed)
-
-    #updating
+        
+    # updating
     def update(self):
-
+        
         #////////////////////////////////Animations//////////////////////////////////////////#
-        #attacking
+        # attacking
         if self.isAttacking == True and self.isHit == False and self.isDeath == False:
             self.currentAttack += 0.4
+            
             if self.currentAttack >= len(self.attackLeftSprites):
                 self.currentAttack = 0
                 self.isAttacking = False
@@ -123,66 +139,83 @@ class Player(GameObject):
                 self.image = self.attackRightSprites[int(self.currentAttack)]
             else:
                self.image = self.attackLeftSprites[int(self.currentAttack)] 
-        #walking
+               
+        # walking
         if self.isWalking == True and self.isAttacking == False and self.isHit == False and self.isDeath == False:
             self.currentWalk += 0.4
+            
             if self.currentWalk >= len(self.walkingLeftSprites):
                 self.currentWalk = 0
                 self.isWalking = False
+                
             if(self.direction == 'r'):
                 self.image = self.walkingRightSprites[int(self.currentWalk)]
             else:
                 self.image = self.walkingLeftSprites[int(self.currentWalk)]
-        #idle
+                
+        # idle
         if self.isAttacking == False and self.isWalking == False and self.isHit == False and self.isDeath == False:
             self.currentIdle += 0.3
+            
             if self.currentIdle >= len(self.idleLeftSprites):
                 self.currentIdle = 0
+
             if(self.direction == 'r'):
                 self.image = self.idleRightSprites[int(self.currentIdle)]
             else:
                 self.image = self.idleLeftSprites[int(self.currentIdle)]
-        #hit
+
+        # hit
         if self.isHit == True and self.isDeath == False:
             self.currentHit += 0.4
+
             if self.currentHit >= len(self.hitLeftSprites):
                 self.currentHit = 0
                 self.isHit = False
+
                 if self.health <= 0:
                     self.death()
                     self.isDeath = True
+
             if(self.direction == 'r'):
                 self.image = self.hitRightSprites[int(self.currentHit)]
             else:
                 self.image = self.hitLeftSprites[int(self.currentHit)]
-        #death
+                
+        # death
         if self.isDeath == True:
             self.currentDeath += 0.4
+            
             if self.currentDeath >= len(self.deathLeftSprites):
                 self.currentDeath = len(self.deathLeftSprites) - 1
                 # self.isDeath = False
+                
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
             else:
                 self.image = self.deathLeftSprites[int(self.currentDeath)]
         #////////////////////////////////Animations//////////////////////////////////////////#
-
-    #////////////////////////////////Animations//////////////////////////////////////////#    
-    #attacking
+        
+    #////////////////////////////////Animation Methods//////////////////////////////////////////#    
+    # attacking
     def attack(self):
         self.isAttacking = True
-    #walking
+        
+    # walking
     def walk(self):
         self.isWalking = True
-    #hit
+
+    # hit
     def hit(self):
         self.isHit = True
-    #death
+        
+    # death
     def death(self):
         self.isDeath = True
-    #////////////////////////////////Animations//////////////////////////////////////////#
+    #////////////////////////////////Animation Methods//////////////////////////////////////////#
     
     #///////////////////////////////Collisions//////////////////////////////////////////#
+    # collision beach scene
     def collisionBeach(self):
         if self.rect.left < bg_rect.left - 25:
             self.rect.left = bg_rect.left - 25
@@ -192,6 +225,8 @@ class Player(GameObject):
             self.rect.top = bg_rect.top - 15
         if pygame.Rect.colliderect(self.rect, waterRect):
             self.rect.bottom = waterRect.top
+
+    # collision forest scene
     def collisionForest(self):
         if self.rect.left < bg_rect.left - 25:
             self.rect.left = bg_rect.left - 25
@@ -205,6 +240,8 @@ class Player(GameObject):
             self.rect.bottom = treeRect.top
         if pygame.Rect.colliderect(self.rect, treeRect):
             self.rect.right = treeRect.left
+            
+    #collision cave scene
     def collisionCave(self):
         if self.rect.left < bg_rect.left - 25:
             self.rect.left = bg_rect.left - 25
@@ -220,53 +257,43 @@ class Player(GameObject):
             self.rect.right = caveRect.left
     #///////////////////////////////Collisions//////////////////////////////////////////#
 
-    # def flipPlayer(self,direction):
-    #     #initialize player image
-    #     player_img_with_left_flip = pygame.transform.flip(self.tempImage, True, False)
-    #     player_img_with_right_flip = self.tempImage
-    #     #initialize player image
-    #     if(direction == 'r'):
-    #         self.image = player_img_with_right_flip
-    #     else:
-    #         self.image = player_img_with_left_flip
-
-#coin sprite
+# coin sprite object
 class Coin(pygame.sprite.Sprite):
     def __init__(self,img_path, centerX, centerY):
         super().__init__()
-
         self.image = pygame.image.load(img_path)
         self.rect = self.image.get_rect()
         self.rect.center = (centerX, centerY)
 
-#mob class
+# mob class object (skeleton)
 class Mob1(GameObject):
     def __init__(self,img_path,health,damage,speed):
         random_side = random.choice([-1,1])
         self.direction = 'r'
         self.type = "skeleton"
         self.playerDamage = 0
-
-        # Deciding whether the mob will spawn the left or right
+        
+        # deciding whether the mob will spawn the left or right
         if random_side == -1: # Left
             rand_x = 50
             self.direction = 'r'
-        else: # Right
+        else:
             rand_x = bg_rect.right-50
             self.direction = 'l'
 
-        # Spawn mob at random y value
+        # spawn mob at random y value
         rand_y = random.randint(50,528 - 50)
-
+        
+        # super constructor call
         super().__init__(img_path,health,damage, rand_x,rand_y,speed)
+        
+        # fixing direction
         if self.direction == "l":
             for i in range(len(self.speed)):
                 self.speed[i] = -self.speed[i]
 
-
-
         #////////////////////////////////Animations//////////////////////////////////////////#
-        #for walking animation
+        # for walking animation
         self.walkingRightSprites = []
         self.walkingLeftSprites = []
         self.walkingRightSprites.append(pygame.image.load('Skeleton\walktile000.png'))
@@ -282,13 +309,17 @@ class Mob1(GameObject):
         self.walkingRightSprites.append(pygame.image.load('Skeleton\walktile010.png'))
         self.walkingRightSprites.append(pygame.image.load('Skeleton\walktile011.png'))
         self.walkingRightSprites.append(pygame.image.load('Skeleton\walktile012.png'))
+
         for i in range(len(self.walkingRightSprites)):
             self.walkingRightSprites[i] = pygame.transform.scale(self.walkingRightSprites[i],(66,88))
+
         for walk in self.walkingRightSprites:
             self.walkingLeftSprites.append(pygame.transform.flip(walk,True,False))
+            
         self.currentWalk = 0
         self.isWalking = True
-        #for attacking animation
+
+        # for attacking animation
         self.attackRightSprites = []
         self.attackLeftSprites = []
         self.attackRightSprites.append(pygame.image.load('Skeleton/attacktile000.png'))
@@ -309,13 +340,17 @@ class Mob1(GameObject):
         self.attackRightSprites.append(pygame.image.load('Skeleton/attacktile015.png'))
         self.attackRightSprites.append(pygame.image.load('Skeleton/attacktile016.png'))
         self.attackRightSprites.append(pygame.image.load('Skeleton/attacktile017.png'))
+
         for i in range(len(self.attackRightSprites)):
             self.attackRightSprites[i] = pygame.transform.scale(self.attackRightSprites[i],(129,111))
+            
         for attack in self.attackRightSprites:
             self.attackLeftSprites.append(pygame.transform.flip(attack,True,False))
+
         self.currentAttack = 0
         self.isAttacking = False
-        #for hit animation
+
+        # for hit animation
         self.hitRightSprites = []
         self.hitLeftSprites = []
         self.hitRightSprites.append(pygame.image.load('Skeleton\hittile000.png'))
@@ -326,16 +361,19 @@ class Mob1(GameObject):
         self.hitRightSprites.append(pygame.image.load('Skeleton\hittile005.png'))
         self.hitRightSprites.append(pygame.image.load('Skeleton\hittile006.png'))
         self.hitRightSprites.append(pygame.image.load('Skeleton\hittile007.png'))
+
         for i in range(len(self.hitRightSprites)):
             self.hitRightSprites[i] = pygame.transform.scale(self.hitRightSprites[i],(66,88))
+
         for hit in self.hitRightSprites:
             self.hitLeftSprites.append(pygame.transform.flip(hit,True,False))
+
         self.currentHit = 0
         self.isHit = False
-        #for death animation
+        
+        # for death animation
         self.deathRightSprites = []
         self.deathLeftSprites = []
-        # self.deathRightSprites.append(pygame.image.load('Skeleton\deadtile000.png'))
         self.deathRightSprites.append(pygame.image.load('Skeleton\deadtile001.png'))
         self.deathRightSprites.append(pygame.image.load('Skeleton\deadtile002.png'))
         self.deathRightSprites.append(pygame.image.load('Skeleton\deadtile003.png'))
@@ -350,91 +388,116 @@ class Mob1(GameObject):
         self.deathRightSprites.append(pygame.image.load('Skeleton\deadtile012.png'))
         self.deathRightSprites.append(pygame.image.load('Skeleton\deadtile013.png'))
         self.deathRightSprites.append(pygame.image.load('Skeleton\deadtile014.png'))
+        
         for i in range(len(self.deathRightSprites)):
             self.deathRightSprites[i] = pygame.transform.scale(self.deathRightSprites[i],(66,88))
+
         for death in self.deathRightSprites:
             self.deathLeftSprites.append(pygame.transform.flip(death,True,False))
+            
         self.currentDeath = 0
         self.isDeath = False
         #////////////////////////////////Animations//////////////////////////////////////////#
         
-        
-    #updating
+    # updating
     def update(self, mob_group, player, coinItem_group):
         if not self.isDeath == True and not self.isHit == True and not self.isAttacking == True:
             self.rect.x = self.rect.x + self.speed[0]
             self.rect.y = self.rect.y + self.speed[1]
 
         #////////////////////////////////Animations//////////////////////////////////////////#
-        #walking
+        # walking
         if self.isWalking == True and self.isAttacking == False and self.isHit == False and self.isDeath == False:
             self.currentWalk += 0.2
+            
             if self.currentWalk >= len(self.walkingLeftSprites):
                 self.currentWalk = 0
+
             if(self.direction == 'r'):
                 self.image = self.walkingRightSprites[int(self.currentWalk)]
             else:
                 self.image = self.walkingLeftSprites[int(self.currentWalk)]
-        #attacking
+
+        # attacking
         if self.isAttacking == True and self.isHit == False and self.isDeath == False:
             self.currentAttack += 0.4
+
             if self.currentAttack >= len(self.attackLeftSprites):
                 self.currentAttack = 0
                 self.isAttacking = False
                 player.health -= self.damage
+
                 if player.health > 0:
                     player.whoKilled = self.type
                 player.hit()
+
             if(self.direction == 'r'):
                 self.image = self.attackRightSprites[int(self.currentAttack)]
             else:
                self.image = self.attackLeftSprites[int(self.currentAttack)] 
-        #hit
+
+        # hit
         if self.isHit == True and self.isDeath == False:
             self.currentHit += 0.4
+
             if self.currentHit >= len(self.hitLeftSprites):
                 self.currentHit = 0
                 self.isHit = False
                 self.health -= self.playerDamage
+
                 if self.health <= 0:
                     self.death()
+
             if(self.direction == 'r'):
                 self.image = self.hitRightSprites[int(self.currentHit)]
             else:
                 self.image = self.hitLeftSprites[int(self.currentHit)]
-        #death
+                
+        # death
         if self.isDeath == True:
             self.currentDeath += 0.4
+
             if self.currentDeath >= len(self.deathLeftSprites):
                 self.currentDeath = len(self.deathLeftSprites) - 1
                 self.isDeath = False
                 self.selfRemove(mob_group)
-                #////////////////////CHANGED THIS HERE///////////////////#
                 rand_x = random.randint(100, 1000)
                 rand_y = random.randint(50,528 - 50)
                 coinItem_group.add(Coin("Scenes\coinItemImage.png", rand_x, rand_y))
+                randExtra = player.luck * 100
+                randNum = random.randint(1,100)
+
+                if randExtra >= randNum:
+                    rand_x = random.randint(100, 1000)
+                    rand_y = random.randint(50,528 - 50)
+                    coinItem_group.add(Coin("Scenes\coinItemImage.png", rand_x, rand_y))
+
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
             else:
                 self.image = self.deathLeftSprites[int(self.currentDeath)]
         #////////////////////////////////Animations//////////////////////////////////////////#
 
-    #////////////////////////////////Animations//////////////////////////////////////////#
-    #attacking
+    #////////////////////////////////Animation Methods//////////////////////////////////////////#
+    # attacking
     def attack(self):
         self.isAttacking = True
-    #hit
+
+    # hit
     def hit(self):
         self.isHit = True
-    #death
+        
+    # death
     def death(self):
         self.isDeath = True
-    #////////////////////////////////Animations//////////////////////////////////////////#
 
+    #////////////////////////////////Animation Methods//////////////////////////////////////////#
+    # remove sprite
     def selfRemove(self, mob_group):
         mob_group.remove(self)
 
     #///////////////////////////////Collisions//////////////////////////////////////////#
+    # collision for beach scene
     def collisionBeach(self):
         if self.rect.left < bg_rect.left:
             self.rect.left = bg_rect.left
@@ -451,6 +514,7 @@ class Mob1(GameObject):
             self.rect.bottom = 528 - 58
             self.speed[1] *= -1
 
+    # collision for forest scene
     def collisionForest(self):
         if self.rect.left < bg_rect.left:
             self.rect.left = bg_rect.left
@@ -473,7 +537,8 @@ class Mob1(GameObject):
             self.rect.right = treeRectLeft.left
             self.speed[0] *= -1
             self.direction = 'l'
-
+            
+    # collision for cave scene       
     def collisionCave(self):
         if self.rect.left < bg_rect.left:
             self.rect.left = bg_rect.left
@@ -498,6 +563,7 @@ class Mob1(GameObject):
             self.direction = 'l'
     #///////////////////////////////Collisions//////////////////////////////////////////#
 
+# mob2 sprite object (goblin)
 class Mob2(GameObject):
     def __init__(self,img_path,health,damage,speed):
         random_side = random.choice([-1,1])
@@ -505,23 +571,25 @@ class Mob2(GameObject):
         self.type = "goblin"
         self.playerDamage = 0
 
-        # Deciding whether the mob will spawn the left or right
-        if random_side == -1: # Left
+        # deciding whether the mob will spawn the left or right
+        if random_side == -1:
             rand_x = 50
             self.direction = 'r'
-        else: # Right
+        else:
             rand_x = bg_rect.right-50
             self.direction = 'l'
-        # Spawn mob at random y value
+            
+        # spawn mob at random y value
         rand_y = random.randint(50,528 - 50)
         super().__init__(img_path,health,damage, rand_x,rand_y,speed)
 
+        # fixing direction
         if self.direction == "l":
             for i in range(len(self.speed)):
                 self.speed[i] = -self.speed[i]
 
         #////////////////////////////////Animations//////////////////////////////////////////#
-        #for walking animation
+        # for walking animation
         self.walkingRightSprites = []
         self.walkingLeftSprites = []
         self.walkingRightSprites.append(pygame.image.load('Goblin/runtile000.png'))
@@ -532,13 +600,17 @@ class Mob2(GameObject):
         self.walkingRightSprites.append(pygame.image.load('Goblin/runtile005.png'))
         self.walkingRightSprites.append(pygame.image.load('Goblin/runtile006.png'))
         self.walkingRightSprites.append(pygame.image.load('Goblin/runtile007.png'))
+
         for i in range(len(self.walkingRightSprites)):
             self.walkingRightSprites[i] = pygame.transform.scale(self.walkingRightSprites[i],(200,200))
+
         for walk in self.walkingRightSprites:
             self.walkingLeftSprites.append(pygame.transform.flip(walk,True,False))
+
         self.currentWalk = 0
         self.isWalking = True
-        #for attacking animation
+        
+        # for attacking animation
         self.attackRightSprites = []
         self.attackLeftSprites = []
         self.attackRightSprites.append(pygame.image.load('Goblin/attacktile000.png'))
@@ -549,103 +621,123 @@ class Mob2(GameObject):
         self.attackRightSprites.append(pygame.image.load('Goblin/attacktile005.png'))
         self.attackRightSprites.append(pygame.image.load('Goblin/attacktile006.png'))
         self.attackRightSprites.append(pygame.image.load('Goblin/attacktile007.png'))
+
         for i in range(len(self.attackRightSprites)):
             self.attackRightSprites[i] = pygame.transform.scale(self.attackRightSprites[i],(200,200))
+
         for attack in self.attackRightSprites:
             self.attackLeftSprites.append(pygame.transform.flip(attack,True,False))
+
         self.currentAttack = 0
         self.isAttacking = False
-        #for hit animation
+        
+        # for hit animation
         self.hitRightSprites = []
         self.hitLeftSprites = []
         self.hitRightSprites.append(pygame.image.load('Goblin\hittile000.png'))
         self.hitRightSprites.append(pygame.image.load('Goblin\hittile001.png'))
         self.hitRightSprites.append(pygame.image.load('Goblin\hittile002.png'))
         self.hitRightSprites.append(pygame.image.load('Goblin\hittile003.png'))
+
         for i in range(len(self.hitRightSprites)):
             self.hitRightSprites[i] = pygame.transform.scale(self.hitRightSprites[i],(200,200))
+
         for hit in self.hitRightSprites:
             self.hitLeftSprites.append(pygame.transform.flip(hit,True,False))
+
         self.currentHit = 0
         self.isHit = False
-        #for death animation
+        
+        # for death animation
         self.deathRightSprites = []
         self.deathLeftSprites = []
-        # self.deathRightSprites.append(pygame.image.load('Goblin\deathtile000.png'))
         self.deathRightSprites.append(pygame.image.load('Goblin\deathtile001.png'))
         self.deathRightSprites.append(pygame.image.load('Goblin\deathtile002.png'))
         self.deathRightSprites.append(pygame.image.load('Goblin\deathtile003.png'))
+
         for i in range(len(self.deathRightSprites)):
             self.deathRightSprites[i] = pygame.transform.scale(self.deathRightSprites[i],(200,200))
+
         for death in self.deathRightSprites:
             self.deathLeftSprites.append(pygame.transform.flip(death,True,False))
+
         self.currentDeath = 0
         self.isDeath = False
         #////////////////////////////////Animations//////////////////////////////////////////#
-        
-    #updating
+
+    # updating
     def update(self,mob_group, player, coinItem_group):
         if not self.isDeath == True and not self.isHit == True and not self.isAttacking == True:
             self.rect.x = self.rect.x + self.speed[0]
             self.rect.y = self.rect.y + self.speed[1]
-
+        
         #////////////////////////////////Animations//////////////////////////////////////////#
-        #walking
+        # walking
         if self.isWalking == True and self.isAttacking == False and self.isHit == False and self.isDeath == False:
             self.currentWalk += 0.2
+
             if self.currentWalk >= len(self.walkingLeftSprites):
                 self.currentWalk = 0
+
             if(self.direction == 'r'):
                 self.image = self.walkingRightSprites[int(self.currentWalk)]
             else:
                 self.image = self.walkingLeftSprites[int(self.currentWalk)]
-        #attacking
+                
+        # attacking
         if self.isAttacking == True and self.isHit == False and self.isDeath == False:
             self.currentAttack += 0.4
+
             if self.currentAttack >= len(self.attackLeftSprites):
                 self.currentAttack = 0
                 self.isAttacking = False
                 player.health -= self.damage
+
                 if player.health > 0:
                     player.whoKilled = self.type
                 player.hit()
+
             if(self.direction == 'r'):
                 self.image = self.attackRightSprites[int(self.currentAttack)]
             else:
                self.image = self.attackLeftSprites[int(self.currentAttack)] 
-        #hit
+               
+        # hit
         if self.isHit == True and self.isDeath == False:
             self.currentHit += 0.4
+
             if self.currentHit >= len(self.hitLeftSprites):
                 self.currentHit = 0
                 self.isHit = False
                 self.health -= self.playerDamage
+
                 if self.health <= 0:
                     self.death()
+                    
             if(self.direction == 'r'):
                 self.image = self.hitRightSprites[int(self.currentHit)]
             else:
                 self.image = self.hitLeftSprites[int(self.currentHit)]
-        #death
+                
+        # death
         if self.isDeath == True:
             self.currentDeath += 0.2
+            
             if self.currentDeath >= len(self.deathLeftSprites):
                 self.currentDeath = len(self.deathLeftSprites) - 1
                 self.isDeath = False
                 self.selfRemove(mob_group)
-                #/////////////COIN DROP FOR GOBLINS//////////////#
                 rand_x = random.randint(100, 1000)
                 rand_y = random.randint(50,528 - 50)
                 coinItem_group.add(Coin("Scenes\coinItemImage.png", rand_x, rand_y))
                 randExtra = player.luck * 100
                 randNum = random.randint(1,100)
-                print(f"luck {player.luck} randextra {randExtra} randnum {randExtra}")
+                
                 if randExtra >= randNum:
                     print("TWO COINS")
                     rand_x = random.randint(100, 1000)
                     rand_y = random.randint(50,528 - 50)
                     coinItem_group.add(Coin("Scenes\coinItemImage.png", rand_x, rand_y))
-
 
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
@@ -653,9 +745,11 @@ class Mob2(GameObject):
                 self.image = self.deathLeftSprites[int(self.currentDeath)]
         #////////////////////////////////Animations//////////////////////////////////////////#
         
+    # remove sprite
     def selfRemove(self, mob_group):
         mob_group.remove(self)
-    #////////////////////////////////Animations//////////////////////////////////////////#
+
+    #////////////////////////////////Animation Methods//////////////////////////////////////////#
     #attacking
     def attack(self):
         self.isAttacking = True
@@ -665,9 +759,10 @@ class Mob2(GameObject):
     #death
     def death(self):
         self.isDeath = True
-    #////////////////////////////////Animations//////////////////////////////////////////#
+    #////////////////////////////////Animation Methods//////////////////////////////////////////#
         
     #///////////////////////////////Collisions//////////////////////////////////////////#
+    # collision for beach scene
     def collisionBeach(self):
         if self.rect.left < bg_rect.left - 70:
             self.rect.left = bg_rect.left - 70
@@ -683,6 +778,8 @@ class Mob2(GameObject):
         if self.rect.bottom > 528 -40:
             self.rect.bottom = 528 - 40
             self.speed[1] *= -1
+
+    # colision for forest scene
     def collisionForest(self):
         if self.rect.left < bg_rect.left-70:
             self.rect.left = bg_rect.left-70
@@ -707,6 +804,7 @@ class Mob2(GameObject):
             self.direction = 'l'
     #///////////////////////////////Collisions//////////////////////////////////////////#
 
+# boss sprite object
 class Boss(GameObject):
     def __init__(self,img_path,health,damage,speed):
         super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery,speed)
@@ -716,8 +814,6 @@ class Boss(GameObject):
         self.framecountmobspawn = 0
         self.playerDamage = 0
         self.type = "boss"
-
-        
 
         #////////////////////////////////Animations//////////////////////////////////////////#
         #for walking animation
@@ -730,12 +826,16 @@ class Boss(GameObject):
         self.walkingRightSprites.append(pygame.image.load('Boss\walktile004.png'))
         self.walkingRightSprites.append(pygame.image.load('Boss\walktile005.png'))
         self.walkingRightSprites.append(pygame.image.load('Boss\walktile006.png'))
+        
         for i in range(len(self.walkingRightSprites)):
             self.walkingRightSprites[i] = pygame.transform.scale(self.walkingRightSprites[i],(200,200))
+            
         for walk in self.walkingRightSprites:
             self.walkingLeftSprites.append(pygame.transform.flip(walk,True,False))
+
         self.currentWalk = 0
         self.isWalking = True
+
         #for attacking animation
         self.attackRightSprites = []
         self.attackLeftSprites = []
@@ -745,12 +845,16 @@ class Boss(GameObject):
         self.attackRightSprites.append(pygame.image.load('Boss/attacktile003.png'))
         self.attackRightSprites.append(pygame.image.load('Boss/attacktile004.png'))
         self.attackRightSprites.append(pygame.image.load('Boss/attacktile005.png'))
+        
         for i in range(len(self.attackRightSprites)):
             self.attackRightSprites[i] = pygame.transform.scale(self.attackRightSprites[i],(200,200))
+            
         for attack in self.attackRightSprites:
             self.attackLeftSprites.append(pygame.transform.flip(attack,True,False))
+            
         self.currentAttack = 0
         self.isAttacking = False
+        
         #for idle animation
         self.idleRightSprites = []
         self.idleLeftSprites = []
@@ -761,12 +865,16 @@ class Boss(GameObject):
         self.idleRightSprites.append(pygame.image.load('Boss\idletile004.png'))
         self.idleRightSprites.append(pygame.image.load('Boss\idletile005.png'))
         self.idleRightSprites.append(pygame.image.load('Boss\idletile006.png'))
+
         for i in range(len(self.idleRightSprites)):
             self.idleRightSprites[i] = pygame.transform.scale(self.idleRightSprites[i],(200,200))
+
         for idle in self.idleRightSprites:
             self.idleLeftSprites.append(pygame.transform.flip(idle,True,False))
+            
         self.currentIdle = 0
         self.isIdle = False
+        
         #for run animation
         self.runRightSprites = []
         self.runLeftSprites = []
@@ -778,12 +886,16 @@ class Boss(GameObject):
         self.runRightSprites.append(pygame.image.load('Boss/run2tile005.png'))
         self.runRightSprites.append(pygame.image.load('Boss/run2tile006.png'))
         self.runRightSprites.append(pygame.image.load('Boss/run2tile007.png'))
+        
         for i in range(len(self.runRightSprites)):
             self.runRightSprites[i] = pygame.transform.scale(self.runRightSprites[i],(200,200))
+            
         for run in self.runRightSprites:
             self.runLeftSprites.append(pygame.transform.flip(run,True,False))
+            
         self.currentRun = 0
         self.isRun = False
+        
         #for death animation
         self.deathRightSprites = []
         self.deathLeftSprites = []
@@ -791,30 +903,40 @@ class Boss(GameObject):
         self.deathRightSprites.append(pygame.image.load('Boss\deathtile001.png'))
         self.deathRightSprites.append(pygame.image.load('Boss\deathtile002.png'))
         self.deathRightSprites.append(pygame.image.load('Boss\deathtile003.png'))
+
         for i in range(len(self.deathRightSprites)):
             self.deathRightSprites[i] = pygame.transform.scale(self.deathRightSprites[i],(200,200))
+
         for death in self.deathRightSprites:
             self.deathLeftSprites.append(pygame.transform.flip(death,True,False))
+
         self.currentDeath = 0
         self.isDeath = False
 
+        # variables/flags
         self.isHit = False
         self.currentHit = 0
         self.flag = False
+
         #////////////////////////////////Animations//////////////////////////////////////////#
     
-    def update(self, player_rect, boss_group, mob_group, player):
-        # Find direction vector (dx, dy) between enemy and player.
+    # update
+    def update(self, player_rect, boss_group, mob_group):
+
+        # find direction vector (dx, dy) between enemy and player.
         dx, dy = player_rect.centerx - self.rect.centerx, player_rect.centery - self.rect.centery
         dist = math.hypot(dx, dy)
+        
         if player_rect.centerx < self.rect.right:
             self.direction = 'l'
         else:
             self.direction = 'r'
 
+        # boss tracking/attacking
         if(dist <= 50 or self.isIdle or self.isAttacking):
             self.framecountmobspawn = 0
             self.isWalking = False
+
             if self.framecount < 20:
                 self.attack()
                 self.framecount = self.framecount + 1
@@ -825,33 +947,39 @@ class Boss(GameObject):
                     self.isIdle = False
                     self.framecount = 0
 
+        # boss mob spawning
         elif(dist>50 and not self.isIdle and not self.isAttacking):
             self.framecount = 0
             self.framecountmobspawn = self.framecountmobspawn + 1
+
             if self.framecountmobspawn > 500:
                 self.mobspawner(mob_group)
                 self.framecountmobspawn = 0
+
             self.walk()
-            dx, dy = dx / dist, dy / dist  # Normalize.
-            # Move along this normalized vector towards the player at current speed.
+            dx, dy = dx / dist, dy / dist 
             self.rect.x += dx * self.speed[0]
             self.rect.y += dy * self.speed[1]
 
 
         #////////////////////////////////Animations//////////////////////////////////////////#
-        #walking
+        # walking
         if self.isWalking == True and self.isAttacking == False and self.isDeath == False and self.isRun == False and self.isIdle == False:
             self.currentWalk += 0.2
+
             if self.currentWalk >= len(self.walkingLeftSprites):
                 self.currentWalk = 0
                 self.isWalking = False
+
             if(self.direction == 'r'):
                 self.image = self.walkingRightSprites[int(self.currentWalk)]
             else:
                 self.image = self.walkingLeftSprites[int(self.currentWalk)]
-        #attacking
+
+        # attacking
         elif self.isAttacking == True and self.isDeath == False:
             self.currentAttack += 0.3
+
             if self.currentAttack >= len(self.attackLeftSprites):
                 self.currentAttack = 0
                 self.isAttacking = False
@@ -860,28 +988,33 @@ class Boss(GameObject):
                 self.image = self.attackRightSprites[int(self.currentAttack)]
             else:
                self.image = self.attackLeftSprites[int(self.currentAttack)] 
-        #idle
+
+        # idle
         elif self.isWalking == False and self.isDeath == False:
             self.currentIdle += 0.3
+
             if self.currentIdle >= len(self.idleLeftSprites):
                 self.currentIdle = 0
-                # self.isIdle = False
+                
             if(self.direction == 'r'):
                 self.image = self.idleRightSprites[int(self.currentIdle)]
             else:
                 self.image = self.idleLeftSprites[int(self.currentIdle)]
-        #death
+
+        # death
         elif self.isDeath == True:
             self.currentDeath += 0.4
+            
             if self.currentDeath >= len(self.deathLeftSprites):
                 self.currentDeath = len(self.deathLeftSprites) - 1
                 self.isDeath = False
                 self.selfRemove(boss_group)
+
             if(self.direction == 'r'):
                 self.image = self.deathRightSprites[int(self.currentDeath)]
             else:
                 self.image = self.deathLeftSprites[int(self.currentDeath)]
-        #run
+        # run
         elif self.isRun == True:
             self.currentRun += 0.4
             if self.currentRun >= len(self.runLeftSprites):
@@ -892,7 +1025,7 @@ class Boss(GameObject):
             else:
                 self.image = self.runLeftSprites[int(self.currentRun)]
 
-        #hit
+        # hit
         if self.isHit == True and self.isDeath == False:
             self.currentHit += 0.4
             if self.currentHit >= 8:
@@ -902,65 +1035,50 @@ class Boss(GameObject):
                 if self.health <= 0:
                     self.death()
             
-
         #////////////////////////////////Animations//////////////////////////////////////////#
 
+    # remove sprite
     def selfRemove(self, boss_group):
         boss_group.remove(self)
 
-    #////////////////////////////////Animations//////////////////////////////////////////#
-    #attacking
+    #////////////////////////////////Animation Methods//////////////////////////////////////////#
+    # attacking
     def attack(self):
         self.isAttacking = True
-    #hit
+
+    # hit
     def idle(self):
         self.isIdle = True
-    #death
+
+    # death
     def death(self):
         self.isDeath = True
-    #run
-    def run(self):
-        self.isRun = True
 
+    # walk
     def walk(self):
         self.isWalking = True
 
+    # hit
     def hit(self):
         self.isHit = True
-    #////////////////////////////////Animations//////////////////////////////////////////#
+    #////////////////////////////////Animation Methods//////////////////////////////////////////#
     
+    # dash attack
     def dash(self):
         self.attack()
     
+    # mob spawn attack
     def mobspawner(self,mob_group):
         for x in range (4):
-            mob_group.add(Mob1("Skeleton\walktile000.png", 50, 50, [2,2]))
+            mob_group.add(Mob1("Skeleton\walktile000.png", 3, 1, [2,2]))
         position = len(mob_group)
-       # mob_group.sprites()[position-4].rect.top = self.rect.bottom
         mob_group.sprites()[position-4].rect.center = self.rect.center
         mob_group.sprites()[position-4].speed = [3,3]
-       # mob_group.sprites()[position-3].rect.bottom = self.rect.top
         mob_group.sprites()[position-3].rect.center = self.rect.center
         mob_group.sprites()[position-3].speed = [-3,3]
         mob_group.sprites()[position-3].direction = 'l'
-       # mob_group.sprites()[position-2].rect.right = self.rect.left
         mob_group.sprites()[position-2].rect.center = self.rect.center
         mob_group.sprites()[position-2].speed = [3,-3]
-       # mob_group.sprites()[position-1].rect.left = self.rect.right
         mob_group.sprites()[position-1].rect.center = self.rect.center
         mob_group.sprites()[position-1].speed = [-3,-3]
         mob_group.sprites()[position-1].direction = 'l'
-
-    
-
-
-
-
-    # def update(self):
-    #     self.rect = self.rect.move(self.rand_xd*self.speed,self.rand_yd*self.speed)
-
-    #     # Edge Collision detection, if collided, bounce off edge
-    #     if (self.rect.left < 140) or (self.rect.right > 1140):
-    #         self.rand_xd *= -1 # Change direction for x
-    #     if (self.rect.top < 0) or (self.rect.bottom > 666):
-    #         self.rand_yd *= -1 # Change direction for y

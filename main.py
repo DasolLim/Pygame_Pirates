@@ -229,7 +229,7 @@ def initializePlayer():
     num_of_player = 1
     for x in range(num_of_player):
         player_group.add(gameSprites.Player(
-            "Pirate/1_entity_000_IDLE_000.png", healthCount, damageCount, speedCount, 500, luckCount))
+            "Pirate/1_entity_000_IDLE_000.png", healthCount, damageCount, speedCount, coinCount, luckCount))
     global player
     player = player_group.sprites()[0]
 

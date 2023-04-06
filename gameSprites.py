@@ -762,23 +762,6 @@ class Mob2(GameObject):
     #////////////////////////////////Animation Methods//////////////////////////////////////////#
         
     #///////////////////////////////Collisions//////////////////////////////////////////#
-    # collision for beach scene
-    def collisionBeach(self):
-        if self.rect.left < bg_rect.left - 70:
-            self.rect.left = bg_rect.left - 70
-            self.speed[0] *= -1
-            self.direction = 'r'
-        if self.rect.right > bg_rect.right - 20:
-            self.rect.right = bg_rect.right - 20
-            self.speed[0] *= -1
-            self.direction = 'l'
-        if self.rect.top < bg_rect.top - 80:
-            self.rect.top = bg_rect.top - 80
-            self.speed[1] *= -1
-        if self.rect.bottom > 528 -40:
-            self.rect.bottom = 528 - 40
-            self.speed[1] *= -1
-
     # colision for forest scene
     def collisionForest(self):
         if self.rect.left < bg_rect.left-70:

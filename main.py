@@ -323,7 +323,8 @@ def render():
             screen.blit(selectedDeathImg,deathImgRect)
     
         # displaying coin sprite
-        coinItem_group.draw(screen)
+        if not bossPlaying:
+            coinItem_group.draw(screen)
 
         # displaying shop
         if shopPlaying and not deathPlaying:
@@ -372,6 +373,7 @@ def render():
         if bossPlaying and not shopPlaying:
             boss_group.update(player_group.sprites()[
                               0].rect, boss_group, mob_group)
+            coinItem_group.empty()
             if not deathPlaying:
                 boss_group.draw(screen)
 
@@ -510,8 +512,10 @@ def collisions():
         for x in hitMobs:
             if player_group.sprites()[0].direction == 'r' and x.direction == 'r' and x.rect.right < player_group.sprites()[0].rect.right:
                 x.attack()
+                player.whoKilled = x.type
             elif player_group.sprites()[0].direction == 'l' and x.direction == 'l' and x.rect.left > player_group.sprites()[0].rect.left:
                 x.attack()
+                player.whoKilled = x.type
 
     # player/boss collisions
     myDict = pygame.sprite.groupcollide(
@@ -572,7 +576,7 @@ while running:
             running = False
 
         # open shop event with escape key
-        if keys[pygame.K_ESCAPE] and not loadPlaying and not shopPlaying:
+        if keys[pygame.K_ESCAPE] and not loadPlaying and not shopPlaying and not bossPlaying:
             sceneBuilder("shop")
             shopPlaying = True
 

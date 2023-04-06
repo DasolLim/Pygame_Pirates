@@ -792,7 +792,6 @@ class Boss(GameObject):
     def __init__(self,img_path,health,damage,speed):
         super().__init__(img_path,health,damage,bg_rect.centerx,bg_rect.centery,speed)
         self.direction = 'r'
-        self.isDash = False
         self.framecount = 0
         self.framecountmobspawn = 0
         self.playerDamage = 0
@@ -896,10 +895,9 @@ class Boss(GameObject):
         self.currentDeath = 0
         self.isDeath = False
 
-        # variables/flags
+        # variables
         self.isHit = False
         self.currentHit = 0
-        self.flag = False
 
         #////////////////////////////////Animations//////////////////////////////////////////#
     
@@ -1046,9 +1044,6 @@ class Boss(GameObject):
         self.isHit = True
     #////////////////////////////////Animation Methods//////////////////////////////////////////#
     
-    # dash attack
-    def dash(self):
-        self.attack()
     
     # mob spawn attack
     def mobspawner(self,mob_group):

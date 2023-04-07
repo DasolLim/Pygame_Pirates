@@ -477,7 +477,7 @@ def collisionPicker(scene):
 
 # player/mob collisions
 def collisions():
-    
+    global deathPlaying
     # coin collisions
     myDict = pygame.sprite.groupcollide(
         player_group, coinItem_group, False, True)
@@ -512,10 +512,12 @@ def collisions():
         for x in hitMobs:
             if player_group.sprites()[0].direction == 'r' and x.direction == 'r' and x.rect.right < player_group.sprites()[0].rect.right:
                 x.attack()
-                player.whoKilled = x.type
+                if not deathPlaying:
+                    player.whoKilled = x.type
             elif player_group.sprites()[0].direction == 'l' and x.direction == 'l' and x.rect.left > player_group.sprites()[0].rect.left:
                 x.attack()
-                player.whoKilled = x.type
+                if not deathPlaying:
+                 player.whoKilled = x.type
 
     # player/boss collisions
     myDict = pygame.sprite.groupcollide(
@@ -537,7 +539,6 @@ def collisions():
         
 
     if(player.health<=0):
-        global deathPlaying
         deathPlaying = True
 
 # reset shop upgrades

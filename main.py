@@ -306,8 +306,12 @@ def render():
         if not deathPlaying:
             # displaying mob sprites
             mob_group.draw(screen)
+    
+        # displaying coin sprite
+        if not bossPlaying:
+            coinItem_group.draw(screen)
 
-        # displaying respective death image
+            # displaying respective death image
         if deathPlaying:
             global selectedDeathImg
             if(player_group.sprites()[0].whoKilled=="skeleton"):
@@ -321,10 +325,6 @@ def render():
             if bossPlaying:
                 boss_group.draw(screen)
             screen.blit(selectedDeathImg,deathImgRect)
-    
-        # displaying coin sprite
-        if not bossPlaying:
-            coinItem_group.draw(screen)
 
         # displaying shop
         if shopPlaying and not deathPlaying:

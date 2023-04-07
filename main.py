@@ -265,7 +265,7 @@ def initializeBoss():
     num_of_mobs = 1
     for x in range(num_of_mobs):
         boss_group.add(gameSprites.Boss(
-            "Boss\walktile000.png", 50, 2, [2.5, 2.5]))
+            "Boss\walktile000.png", 35, 2, [2.5, 2.5]))
         
 # render images
 def render():

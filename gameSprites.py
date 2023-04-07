@@ -734,7 +734,6 @@ class Mob2(GameObject):
                 randNum = random.randint(1,100)
                 
                 if randExtra >= randNum:
-                    print("TWO COINS")
                     rand_x = random.randint(100, 1000)
                     rand_y = random.randint(50,528 - 50)
                     coinItem_group.add(Coin("Scenes\coinItemImage.png", rand_x, rand_y))

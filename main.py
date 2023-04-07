@@ -530,10 +530,11 @@ def collisions():
             x.hit()
 
     if boss_group and pygame.sprite.collide_rect(player,boss_group.sprites()[0]) and boss_group.sprites()[0].framecount == 20:
-        player.health -= boss_group.sprites()[0].damage
-        player.hit()
         if player.health > 0:
             player.whoKilled = boss_group.sprites()[0].type
+        player.health -= boss_group.sprites()[0].damage
+        player.hit()
+        
 
     if(player.health<=0):
         global deathPlaying
@@ -705,25 +706,6 @@ while running:
             player_group.sprites()[0].walk()
             player_group.sprites()[0].rect.y += speedCount[0]
             player_group.sprites()[0].speed = speedCount
-
-    # ///////////////////////////#
-    # if conditions are met and player exits screen through right side
-    if keys[pygame.K_f]:
-        sceneBuilder("forest")
-    if keys[pygame.K_c]:
-        sceneBuilder('cave')
-        bossPlaying = True
-    # if conditions are met for game completion
-    if keys[pygame.K_t]:
-        sceneBuilder('treasure')
-        win = True
-    if keys[pygame.K_b]:
-        sceneBuilder('beach')
-    if keys[pygame.K_4]:
-        mob_group.empty()
-        boss_group.empty()
-        coinItem_group.empty()
-    #/////////////////////////////////////#
     
     # advancing to next stage
     if not mob_group and not boss_group and not scene == 'treasure':

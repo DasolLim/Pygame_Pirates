@@ -19,8 +19,26 @@ Welcome to Team 17's game called "Captian Crunch's Adventure." In this game play
 Pygame Pirates Gameplay (Youtube)
 https://youtu.be/i6ewJrxDoo8
 
-## Languages
+## Pygame Developlement
+
+### Languages
 Python
 
-## What is Pygame?
+### What is Pygame?
 A cross-platform set of Python modules designed for writing video games 🚀
+
+### Images
+![1](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/dc23b0bf-7558-4c77-ac52-bf99216baf02)
+#### Start Screen
+![2](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/712876b6-57d0-44ce-a5ad-032dee6d4c39)
+#### Beach Scene
+![3](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/64fcc8db-fc1e-4d9d-b718-769d7f36b2cd)
+#### Forest Scene
+![4](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/3fae8b3e-493f-41ce-a417-f40b495ef8a1)
+#### Cave Scene
+![5](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/515f8ca4-6322-422c-b7d8-39c2ae1c7548)
+#### Boss Spawning Mobs
+![6](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/6a852ab5-5606-401e-a041-756e38811e0a)
+#### Shop Menu
+![7](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/1756998d-7daf-4a4b-ab82-0d07e1aa23f6)
+### End-Game Result Screen

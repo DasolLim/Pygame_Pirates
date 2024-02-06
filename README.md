@@ -15,8 +15,8 @@ Welcome to Team 17's game called "Captian Crunch's Adventure." In this game play
 - Running over coins that drop on the floor once mobs are killed gives the player +10 Coin Currency
 - If the player wants to skip a room or go to the next room after killing all mobs, press '4'
 
-## Link
-Pygame Pirates Gameplay (Youtube)
+## Youtube Link
+Pygame Pirates Gameplay
 https://youtu.be/i6ewJrxDoo8
 
 ## Pygame Developlement

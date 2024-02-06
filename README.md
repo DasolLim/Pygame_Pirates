@@ -16,8 +16,7 @@ Welcome to Team 17's game called "Captian Crunch's Adventure." In this game play
 - If the player wants to skip a room or go to the next room after killing all mobs, press '4'
 
 ## Youtube Link
-Pygame Pirates Gameplay
-https://youtu.be/i6ewJrxDoo8
+Pygame Pirates Gameplay: https://youtu.be/i6ewJrxDoo8
 
 ## Pygame Developlement
 

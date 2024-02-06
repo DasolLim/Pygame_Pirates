@@ -28,28 +28,23 @@ Python
 A cross-platform set of Python modules designed for writing video games 🚀
 
 ### Images
+#### _Start Screen_
 ![1](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/dc23b0bf-7558-4c77-ac52-bf99216baf02)
 
-_Start Screen_
-
+#### _Beach Scene_
 ![2](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/712876b6-57d0-44ce-a5ad-032dee6d4c39)
 
-_Beach Scene_
-
+#### _Forest Scene_
 ![3](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/64fcc8db-fc1e-4d9d-b718-769d7f36b2cd)
 
-_Forest Scene_
-
+#### _Cave Scene_
 ![4](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/3fae8b3e-493f-41ce-a417-f40b495ef8a1)
 
-_Cave Scene_
-
+#### _Boss Spawning Mobs_
 ![5](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/515f8ca4-6322-422c-b7d8-39c2ae1c7548)
 
-_Boss Spawning Mobs_
-
+#### _Shop Menu_
 ![6](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/6a852ab5-5606-401e-a041-756e38811e0a)
 
-_Shop Menu_
+#### _End-Game Result Screen_
 ![7](https://github.com/DasolLim/Pygame_Pirates/assets/92288227/1756998d-7daf-4a4b-ab82-0d07e1aa23f6)
-_End-Game Result Screen_

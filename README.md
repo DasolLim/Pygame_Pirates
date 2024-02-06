@@ -11,3 +11,6 @@ Controls:
 - Pressing the space bar allows player to perform an attack
 - Running over coins that drop on the floor once mobs are killed gives the player +10 Coin Currency
 - If the player wants to skip a room or go to the next room after killing all mobs, press '4'
+
+Pygame Pirates Gameplay (Youtube)
+https://youtu.be/i6ewJrxDoo8
